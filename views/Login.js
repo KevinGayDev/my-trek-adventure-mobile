@@ -116,6 +116,12 @@ export default function Login({ navigation }) {
           >
             <Text style={styles.textbutton}>Pas encore inscrit</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Navbar")}
+          >
+            <Text style={styles.textbutton}>Passage secret</Text>
+          </TouchableOpacity>
         </View>
       </TouchableWithoutFeedback>
     </ScrollView>
