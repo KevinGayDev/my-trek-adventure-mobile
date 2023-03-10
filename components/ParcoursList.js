@@ -46,7 +46,8 @@ export default function ParcoursList({navigation}) {
           <TouchableOpacity 
           style={styles.button}
           onPress={() =>
-            navigation.navigate("ParcoursSingle", { slug : parcours.slug
+            // navigation.navigate("ParcoursSingle", { slug : parcours.slug
+              navigation.navigate("ParcoursSingle", { slug : parcours.slug
               // userID: METTRE ICI La donnée à renvoyer dans la page parcours Single.
             })
           }>

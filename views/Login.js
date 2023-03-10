@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import * as React from "react";
 import { useState, useContext } from "react";
-
+import * as SecureStore from 'expo-secure-store';
 import backServerAddress from "../config";
 export default function Login({ navigation }) {
   //  const { setUserLog } = useContext(UserConnect);
@@ -51,10 +51,19 @@ export default function Login({ navigation }) {
         const data = await result.json();
 
         // retreive token
-        // const token = data.token;
+        const token = data.token;
         if (data.success) {
           setsuccessMessage(data.message);
           setErrorMessage(null);
+
+          // Stock Token into LocalStorage
+          // localStorage.setItem("token", token);
+          async function save(key, value) {
+            await SecureStore.setItemAsync(key, value);
+          }
+          save("token", token)
+
+          // Change screen if success
           navigation.navigate("Navbar");
 
           // TODO
@@ -70,9 +79,7 @@ export default function Login({ navigation }) {
   }
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-    >
+    <ScrollView contentContainerStyle={styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <Text>Identifiant</Text>

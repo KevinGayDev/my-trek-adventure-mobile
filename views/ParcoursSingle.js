@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useState, useEffect,  } from "react";
+import { StyleSheet, Text, View,  } from "react-native";
 import backServerAddress from "../config";
 
 
@@ -11,7 +11,9 @@ console.log("parcoursSlug",slug)
 const [parcours, setParcours] = useState({});
 const [errorMessage, setErrorMessage] = useState(null);
 
-useEffect(() => {displayParcours()}, [])
+useEffect(() => {displayParcours()}, [slug])
+// useFocusEffect  ?????????????????????
+
 
 async function displayParcours() {
 
@@ -40,7 +42,7 @@ async function displayParcours() {
 
 
     {parcours?.steps?.map((step) => 
-    <View>
+    <View key={parcours.slug}>
     <Text>{step.stepName}</Text>
     <Text>{step.stepPicture}</Text>
     <Text>{step.stepDescription}</Text>
