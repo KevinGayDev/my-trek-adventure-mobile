@@ -1,14 +1,17 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
 import ParcoursList from "../components/ParcoursList";
 
 export default function Parcours({navigation}) {
   return (
+    <ScrollView contentContainerStyle={styles.containerScroll}>
+
     <View style={styles.container}>
       <Text style={styles.title}>Parcours proposés</Text>
  
 
       <ParcoursList navigation={navigation} />
     </View>
+    </ScrollView>
   );
 }
 
@@ -17,6 +20,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+
   },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    margin: 20
+  }
 });

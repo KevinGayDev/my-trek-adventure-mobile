@@ -1,4 +1,4 @@
-import { StyleSheet,} from "react-native";
+import { StyleSheet, ScrollView} from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { Foundation } from '@expo/vector-icons'; 
@@ -15,6 +15,7 @@ export default function Navbar() {
     <Tab.Navigator 
     //  screenOptions={{ headerShown: false }} 
      >
+
       <Tab.Screen
         name="Mes treks"
         component={Treks}
@@ -40,7 +41,7 @@ export default function Navbar() {
 <Tab.Screen
         name="Mon profil"
         component={Profil}
-        options={{
+        options={{ 
           tabBarIcon: ({ color, size, focused, activecolor  }) => (
             <Foundation name="info" size={size} color={color}  />
           ),
@@ -51,8 +52,14 @@ export default function Navbar() {
         name="ParcoursSingle"
         component={ParcoursSingle}
         options={{
+          
+          title: 'Détails du parcours',
+        tabBarLabel: "Home",
+
           tabBarButton: () => null,
         }}
+
+        
       />
     </Tab.Navigator>
 

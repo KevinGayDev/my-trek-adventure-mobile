@@ -115,8 +115,7 @@ export default function Login({ navigation }) {
             {/* onPress={() => navigation.navigate("Navbar")}> */}
             <Text style={styles.textbutton}>Se connecter</Text>
           </TouchableOpacity>
-          <Text>{errorMessage}</Text>
-          <Text>{successMessage}</Text>
+     
           <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate("Register")}
@@ -128,7 +127,13 @@ export default function Login({ navigation }) {
             onPress={() => navigation.navigate("Navbar")}
           >
             <Text style={styles.textbutton}>Passage secret</Text>
+
+
           </TouchableOpacity>
+
+          { {errorMessage} && <Text>{errorMessage}</Text>}
+          { {successMessage} && <Text>{successMessage}</Text>}
+
         </View>
       </TouchableWithoutFeedback>
     </ScrollView>
@@ -162,7 +167,7 @@ const styles = StyleSheet.create({
     alignContent: "center",
     justifyContent: "center",
     borderRadius: 16,
-    margin: 36,
+    margin: 10,
     backgroundColor: "#f89d0e",
   },
   textbutton: {

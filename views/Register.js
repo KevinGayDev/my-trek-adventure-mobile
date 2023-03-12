@@ -8,14 +8,17 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   StatusBar,
-  ScrollView
+  ScrollView,
 } from "react-native";
 
 import * as React from "react";
 import { useState, useContext } from "react";
 import backServerAddress from "../config";
+import ImagePickerComponent from "../components/ImagePickerComponent";
 
 export default function Register({ navigation }) {
+  const [image, setImage] = useState(null);
+
   const [user, setUser] = useState({
     firstName: "",
     lastName: "",
@@ -82,84 +85,86 @@ export default function Register({ navigation }) {
   }
 
   return (
-  
-    <KeyboardAvoidingView 
-    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    style={styles.container}
-  >
-      <ScrollView>
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+            <ScrollView contentContainerStyle={{flexGrow: 1}}>
 
-    <View style={styles.container}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.container}>
+            <Text style={styles.text}>Prénom</Text>
+            <TextInput
+              style={styles.input}
+              // onChangeText={onChangeNumber}
+              // value={number}
+              onChangeText={(value) => handleChange("firstName", value)}
+              placeholder="Votre Prénom"
+              keyboardType="default"
+            />
+            <Text style={styles.text}>Nom</Text>
+            <TextInput
+              style={styles.input}
+              // onChangeText={onChangeNumber}
+              // value={number}
+              onChangeText={(value) => handleChange("lastName", value)}
+              placeholder="Votre Nom"
+              keyboardType="default"
+            />
 
-      <Text  style={styles.text} >Prénom</Text>
-      <TextInput
-        style={styles.input}
-        // onChangeText={onChangeNumber}
-        // value={number}
-        onChangeText={(value) => handleChange("firstName", value)}
-        placeholder="Votre Prénom"
-        keyboardType="default"
-      />
-      <Text style={styles.text}>Nom</Text>
-      <TextInput
-        style={styles.input}
-        // onChangeText={onChangeNumber}
-        // value={number}
-        onChangeText={(value) => handleChange("lastName", value)}
-        placeholder="Votre Nom"
-        keyboardType="default"
-      />
-
-      <Text style={styles.text}>Mail</Text>
-      <TextInput
-        style={styles.input}
-        // onChangeText={onChangeNumber}
-        // value={number}
-        placeholder="Votre adresse email"
-        keyboardType="email-address"
-        value={user.mail}
-        onChangeText={(value) => handleChange("mail", value)}
-      />
-      <Text style={styles.text}>Mot de passe</Text>
-      <TextInput
-        style={styles.input}
-        // onChangeText={onChangeNumber}
-        // value={number}
-        placeholder="Votre mot de passe"
-        keyboardType="default"
-        onChangeText={(value) => handleChange("password", value)}
-        secureTextEntry={true}
-      />
-      <TextInput
+            <Text style={styles.text}>Mail</Text>
+            <TextInput
+              style={styles.input}
+              // onChangeText={onChangeNumber}
+              // value={number}
+              placeholder="Votre adresse email"
+              keyboardType="email-address"
+              value={user.mail}
+              onChangeText={(value) => handleChange("mail", value)}
+            />
+            <Text style={styles.text}>Mot de passe</Text>
+            <TextInput
+              style={styles.input}
+              // onChangeText={onChangeNumber}
+              // value={number}
+              placeholder="Votre mot de passe"
+              keyboardType="default"
+              onChangeText={(value) => handleChange("password", value)}
+              secureTextEntry={true}
+            />
+            {/* <TextInput
         style={styles.input}
         // onChangeText={onChangeNumber}
         // value={number}
         placeholder="Photo de profil"
         keyboardType="default"
         onChangeText={(value) => handleChange("profilePicture", value)}
-      />
-      <TouchableOpacity style={styles.button} onPress={() => handleSubmit()}>
-        <Text style={styles.textbutton}>S'inscrire</Text>
-      </TouchableOpacity>
-      <Text>{errorMessage} {successMessage}</Text>
+      /> */}
 
-      {/*  TODO Affichage conditionnel du boutton lorsque le register est OK. */}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Login")}
-      >
-        <Text>Vers la page de connexion </Text>
-      </TouchableOpacity>
-    
-    </View>
-    
-    </TouchableWithoutFeedback>
-    </ScrollView>
-            </KeyboardAvoidingView>
-        
+            <ImagePickerComponent image={image} setImage={setImage} />
 
+            <Text>{image}</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleSubmit()}
+            >
+              <Text style={styles.textbutton}>S'inscrire</Text>
+            </TouchableOpacity>
+            <Text>
+              {errorMessage} {successMessage}
+            </Text>
 
+            {/*  TODO Affichage conditionnel du boutton lorsque le register est OK. */}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate("Login")}
+            >
+              <Text>Vers la page de connexion </Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableWithoutFeedback>
+        </ScrollView>
+      </KeyboardAvoidingView>
   );
 }
 
@@ -174,7 +179,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
     alignSelf: "flex-start",
     paddingBottom: 10,
-    },
+  },
   container: {
     flex: 1,
     backgroundColor: "#f89d0e",

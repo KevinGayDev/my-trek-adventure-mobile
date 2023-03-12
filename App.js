@@ -22,7 +22,7 @@ export default function App() {
 
   async function getUser() {
     // const token = localStorage.getItem("token");
-    const token = getValueFor("token")
+    const token = await SecureStore.getItemAsync("token");
     console.log("token" , token);
     if (!token)
     {
@@ -45,16 +45,7 @@ export default function App() {
   }
 
 
-// 
-  async function getValueFor(key) {
-    let result = await SecureStore.getItemAsync(key);
-    if (result) {
-      console.log("RESULT : ", result)
-      alert("🔐 Here's your value 🔐 \n" + result);
-    } else {
-      alert('No values stored under that key.');
-    }
-  }  
+
 
   const Stack = createStackNavigator();
 
