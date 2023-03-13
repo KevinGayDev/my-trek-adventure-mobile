@@ -5,8 +5,10 @@ import { Foundation } from '@expo/vector-icons';
 import Treks from "./Treks";
 import Parcours from "./Parcours";
 import Profil from "./Profil";
+import ParcoursSingle from "./ParcoursSingle";
 
 export default function Navbar() {
+  
   const Tab = createBottomTabNavigator();
 
   return (
@@ -25,7 +27,7 @@ export default function Navbar() {
       />
 
       <Tab.Screen
-        name="Réserser"
+        name="Réserver"
         component={Parcours}
         options={{
           // tabBarLabel: "Home",
@@ -42,8 +44,14 @@ export default function Navbar() {
           tabBarIcon: ({ color, size, focused, activecolor  }) => (
             <Foundation name="info" size={size} color={color}  />
           ),
-        // tabBarIconStyle: { display: "none" },
-        // tabBarVisible: false,
+        }}
+      />
+
+<Tab.Screen
+        name="ParcoursSingle"
+        component={ParcoursSingle}
+        options={{
+          tabBarButton: () => null,
         }}
       />
     </Tab.Navigator>

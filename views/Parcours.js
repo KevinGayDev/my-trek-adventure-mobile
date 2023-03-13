@@ -1,15 +1,13 @@
 import { StyleSheet, Text, View } from "react-native";
 import ParcoursList from "../components/ParcoursList";
 
-export default function Parcours() {
+export default function Parcours({navigation}) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Infos</Text>
-      <Text style={styles.content}>
-    Info Parcours
-      </Text>
+      <Text style={styles.title}>Parcours proposés</Text>
+ 
 
-      <ParcoursList />
+      <ParcoursList navigation={navigation} />
     </View>
   );
 }
