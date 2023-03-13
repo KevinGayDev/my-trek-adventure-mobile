@@ -6,13 +6,25 @@ import Treks from "./Treks";
 import Parcours from "./Parcours";
 import Profil from "./Profil";
 import ParcoursSingle from "./ParcoursSingle";
+import { UserConnect } from "../App";
+import { useContext } from "react";
 
-export default function Navbar() {
+// import ParcoursStackNav from "./ParcoursStackNav";
+
+export default function Navbar({navigation}) {
   
   const Tab = createBottomTabNavigator();
+  const {userLog, disconnect} = useContext(UserConnect);
+
+  if (!userLog) {
+    disconnect();
+    navigation.navigate("Login");}
+  
 
   return (
     <Tab.Navigator 
+    screenOptions={{tabBarHideOnKeyboard: true }}
+   
     //  screenOptions={{ headerShown: false }} 
      >
 

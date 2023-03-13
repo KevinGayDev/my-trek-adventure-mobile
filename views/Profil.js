@@ -6,17 +6,23 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  ImageBackground
+  ImageBackground,
 } from "react-native";
 import ImagePickerComponent from "../components/ImagePickerComponent";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
+import { UserConnect } from "../App";
 
-export default function Profil() {
+export default function Profil({ navigation }) {
   // Image for ImagePickerComponent passed as prop
   const [image, setImage] = useState(null);
+
+  // Check if the Button "Modify Profil" is clicked
   const [isClicked, setIsClicked] = useState(false);
+
+  // Pass context to check if user is logged or not
+  const { userLog, disconnect } = useContext(UserConnect);
 
   const [userDetail, setUserDetail] = useState({
     firstName: "",
@@ -26,12 +32,18 @@ export default function Profil() {
     profilePicture: "",
     slug: "",
   });
+
   console.log("userDetail", userDetail);
 
   // Load the first time
   useEffect(() => {
     getUserUnique();
   }, []);
+
+  // If user is not logged force navigate to login page
+  if (!userLog) {
+    navigation.navigate("Login");
+  }
 
   // get the "user" info from DB
   async function getUserUnique() {
@@ -59,7 +71,7 @@ export default function Profil() {
     setUser({ ...user, [label]: value });
   }
 
-// Submit change to server and DB
+  // Submit change to server and DB
   async function handleSubmit() {
     if (
       user.firstName === "" ||
@@ -83,7 +95,7 @@ export default function Profil() {
         },
         body: JSON.stringify(user),
       };
-      try {  
+      try {
         const result = await fetch(
           `http://${backServerAddress}:3001/clients/update`,
           options
@@ -111,10 +123,9 @@ export default function Profil() {
 
   return (
     <ScrollView contentContainerStyle={styles.containerScroll}>
-      <ImageBackground source={require("../assets/nik-shuliahin-rkFIIE9PxH0-unsplash.jpg")}  style={{flex:1, }}>
-      <View style={styles.container}>
+      {/* <ImageBackground source={require("../assets/nik-shuliahin-rkFIIE9PxH0-unsplash.jpg")}  style={{flex:1, }}> */}
 
-    
+      <View style={styles.container}>
         {userDetail?.profilePicture !== "" && (
           <Image
             style={styles.profilePicture}
@@ -126,6 +137,10 @@ export default function Profil() {
         <Text style={styles.content}>{userDetail?.lastName}</Text>
         <Text style={styles.content}>{userDetail?.mail}</Text>
         <Text style={styles.content}>{userDetail?.pro}</Text>
+
+        <TouchableOpacity style={styles.button} onPress={() => disconnect()}>
+          <Text style={styles.textbutton}>Me déconnecter</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.button}
@@ -189,10 +204,8 @@ export default function Profil() {
             />
           </View>
         )}
-        
-
       </View>
-      </ImageBackground>
+      {/* </ImageBackground> */}
     </ScrollView>
   );
 }
@@ -202,15 +215,19 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
+    backgroundColor: "white",
+    margin: 20,
+    borderRadius: 16,
   },
   containerScroll: {
     flexGrow: 1,
+    backgroundColor: "lightblue",
   },
 
   profilePicture: {
     width: 200,
     height: 200,
-    marginVertical: 20
+    marginVertical: 20,
   },
   input: {
     borderRadius: 16,

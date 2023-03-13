@@ -1,14 +1,18 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import ParcoursList from "../components/ParcoursList";
+import { UserConnect } from "../App";
+import { useContext } from "react";
+
 
 export default function Parcours({navigation}) {
+
+  const {userLog} = useContext(UserConnect);
+
   return (
     <ScrollView contentContainerStyle={styles.containerScroll}>
 
     <View style={styles.container}>
       <Text style={styles.title}>Parcours proposés</Text>
- 
-
       <ParcoursList navigation={navigation} />
     </View>
     </ScrollView>

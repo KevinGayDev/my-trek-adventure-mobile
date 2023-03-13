@@ -9,6 +9,8 @@ import {
   Keyboard,
   StatusBar,
   ScrollView,
+  FormData,
+
 } from "react-native";
 
 import * as React from "react";
@@ -17,7 +19,18 @@ import backServerAddress from "../config";
 import ImagePickerComponent from "../components/ImagePickerComponent";
 
 export default function Register({ navigation }) {
+
   const [image, setImage] = useState(null);
+
+
+React.useEffect(() => {
+  setUser({ ...user, ["profilePicture"]: image });
+}, [image]);
+
+React.useEffect(() => {
+  console.log(user)
+  ;
+}, [user]);
 
   const [user, setUser] = useState({
     firstName: "",
@@ -50,13 +63,31 @@ export default function Register({ navigation }) {
     ) {
       setErrorMessage(null);
 
+      // let options = {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(user),
+      // };
+
+
+      let formdata = new React.FormData();
+      form.append("firstName", user.firstName);
+      form.append("lastName", user.lastName);
+      form.append("mail", user.mail);
+      form.append("password", user.password);
+      form.append("clientPicture", {
+        uri : user.image});
+
       let options = {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": 'multipart/form-data',
         },
-        body: JSON.stringify(user),
-      };
+        body: formdata
+            };
+
       try {
         // Post data to DB on /login routes
         const result = await fetch(
@@ -93,6 +124,7 @@ export default function Register({ navigation }) {
 
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
+
             <Text style={styles.text}>Prénom</Text>
             <TextInput
               style={styles.input}
@@ -153,6 +185,7 @@ export default function Register({ navigation }) {
             <Text>
               {errorMessage} {successMessage}
             </Text>
+
 
             {/*  TODO Affichage conditionnel du boutton lorsque le register est OK. */}
             <TouchableOpacity

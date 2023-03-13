@@ -10,10 +10,12 @@ import {
 } from "react-native";
 import * as React from "react";
 import { useState, useContext } from "react";
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store";
 import backServerAddress from "../config";
+import { UserConnect } from "../App";
+
 export default function Login({ navigation }) {
-  //  const { setUserLog } = useContext(UserConnect);
+  const { setUserLog } = useContext(UserConnect);
 
   const [user, setUser] = useState({
     mail: "",
@@ -22,6 +24,7 @@ export default function Login({ navigation }) {
 
   const [errorMessage, setErrorMessage] = React.useState(null);
   const [successMessage, setsuccessMessage] = React.useState(null);
+  const { userLog } = useContext(UserConnect);
 
   function handleChange(label, value) {
     setUser({ ...user, [label]: value });
@@ -61,13 +64,12 @@ export default function Login({ navigation }) {
           async function save(key, value) {
             await SecureStore.setItemAsync(key, value);
           }
-          save("token", token)
+          save("token", token);
+
+          setUserLog(data.user);
 
           // Change screen if success
           navigation.navigate("Navbar");
-
-          // TODO
-          // setUserLog(data.user);
         } else if (!data.success) {
           setErrorMessage(data.message);
           setsuccessMessage(null);
@@ -115,7 +117,7 @@ export default function Login({ navigation }) {
             {/* onPress={() => navigation.navigate("Navbar")}> */}
             <Text style={styles.textbutton}>Se connecter</Text>
           </TouchableOpacity>
-     
+
           <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate("Register")}
@@ -127,13 +129,10 @@ export default function Login({ navigation }) {
             onPress={() => navigation.navigate("Navbar")}
           >
             <Text style={styles.textbutton}>Passage secret</Text>
-
-
           </TouchableOpacity>
 
-          { {errorMessage} && <Text>{errorMessage}</Text>}
-          { {successMessage} && <Text>{successMessage}</Text>}
-
+          {{ errorMessage } && <Text>{errorMessage}</Text>}
+          {{ successMessage } && <Text>{successMessage}</Text>}
         </View>
       </TouchableWithoutFeedback>
     </ScrollView>

@@ -1,10 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { StyleSheet, Text, View, Image, ScrollView } from "react-native";
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
+import { UserConnect } from "../App";
+
 
 export default function ParcoursSingle({ route }) {
   const { slug, id, name } = route.params;
+  const {userLog} = useContext(UserConnect);
+
 
   // retreive parcours details from server
   const [parcours, setParcours] = useState({});

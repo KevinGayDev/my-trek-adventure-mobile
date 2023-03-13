@@ -3,8 +3,12 @@ import {
     Text,
     View,
   } from "react-native";
-
+  import { UserConnect } from "../App";
+  import { useContext } from "react";
+  
   export default function Treks() {
+
+    const {userLog} = useContext(UserConnect);
 
 
     return (
