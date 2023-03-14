@@ -1,4 +1,4 @@
-import { StyleSheet,} from "react-native";
+import { StyleSheet, ScrollView} from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { Foundation } from '@expo/vector-icons'; 
@@ -6,15 +6,30 @@ import Treks from "./Treks";
 import Parcours from "./Parcours";
 import Profil from "./Profil";
 import ParcoursSingle from "./ParcoursSingle";
+import TreksSingle from "./TreksSingle";
 
-export default function Navbar() {
+// import { UserConnect } from "../App";
+// import { useContext } from "react";
+
+// import ParcoursStackNav from "./ParcoursStackNav";
+
+export default function Navbar({navigation}) {
   
   const Tab = createBottomTabNavigator();
+  // const {userLog, disconnect} = useContext(UserConnect);
+
+  // if (!userLog) {
+  //   disconnect();
+  //   navigation.navigate("Login");}
+  
 
   return (
     <Tab.Navigator 
+    screenOptions={{tabBarHideOnKeyboard: true }}
+   
     //  screenOptions={{ headerShown: false }} 
      >
+
       <Tab.Screen
         name="Mes treks"
         component={Treks}
@@ -40,7 +55,7 @@ export default function Navbar() {
 <Tab.Screen
         name="Mon profil"
         component={Profil}
-        options={{
+        options={{ 
           tabBarIcon: ({ color, size, focused, activecolor  }) => (
             <Foundation name="info" size={size} color={color}  />
           ),
@@ -51,9 +66,25 @@ export default function Navbar() {
         name="ParcoursSingle"
         component={ParcoursSingle}
         options={{
+          
+          title: 'Détails du parcours',
+        tabBarLabel: "Home",
+
           tabBarButton: () => null,
         }}
       />
+
+<Tab.Screen
+        name="TreksSingle"
+        component={TreksSingle}
+        options={{
+          
+          title: 'Détails du trek',
+        tabBarLabel: "Home",
+
+          tabBarButton: () => null,
+        }}
+      />      
     </Tab.Navigator>
 
   );
