@@ -7,6 +7,7 @@ import Parcours from "./Parcours";
 import Profil from "./Profil";
 import ParcoursSingle from "./ParcoursSingle";
 import TreksSingle from "./TreksSingle";
+import TreksUser from "./TreksUser";
 
 // import { UserConnect } from "../App";
 // import { useContext } from "react";
@@ -84,8 +85,23 @@ export default function Navbar({navigation}) {
 
           tabBarButton: () => null,
         }}
-      />      
+      />   
+
+<Tab.Screen
+        name="TreksUser"
+        component={TreksUser}
+        options={{
+          
+          title: 'Détails du trek',
+        tabBarLabel: "Home",
+
+          tabBarButton: () => null,
+        }}
+      />   
+
     </Tab.Navigator>
+
+    
 
   );
 }
