@@ -9,8 +9,6 @@ import {
   Keyboard,
   StatusBar,
   ScrollView,
-  FormData,
-
 } from "react-native";
 
 import * as React from "react";
@@ -19,25 +17,22 @@ import backServerAddress from "../config";
 import ImagePickerComponent from "../components/ImagePickerComponent";
 
 export default function Register({ navigation }) {
-
   const [image, setImage] = useState(null);
 
+  React.useEffect(() => {
+    setUser({ ...user, ["profilePicture"]: image });
+  }, [image]);
 
-React.useEffect(() => {
-  setUser({ ...user, ["profilePicture"]: image });
-}, [image]);
-
-React.useEffect(() => {
-  console.log(user)
-  ;
-}, [user]);
+  React.useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   const [user, setUser] = useState({
     firstName: "",
     lastName: "",
     mail: "",
     password: "",
-    profilePicture: "",
+    clientPicture: "",
   });
 
   const [errorMessage, setErrorMessage] = React.useState(null);
@@ -63,30 +58,25 @@ React.useEffect(() => {
     ) {
       setErrorMessage(null);
 
-      // let options = {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(user),
-      // };
-
-
-      let formdata = new React.FormData();
-      form.append("firstName", user.firstName);
-      form.append("lastName", user.lastName);
-      form.append("mail", user.mail);
-      form.append("password", user.password);
-      form.append("clientPicture", {
-        uri : user.image});
+      console.log(user);
+      let formdata = new FormData();
+      formdata.append("firstName", user.firstName);
+      formdata.append("lastName", user.lastName);
+      formdata.append("mail", user.mail);
+      formdata.append("password", user.password);
+      formdata.append("clientPicture", {
+        name: "profile.jpeg",
+        uri: image,
+        type: "image/jpeg",
+      });
 
       let options = {
         method: "POST",
         headers: {
-          "Content-Type": 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
-        body: formdata
-            };
+        body: formdata,
+      };
 
       try {
         // Post data to DB on /login routes
@@ -116,15 +106,13 @@ React.useEffect(() => {
   }
 
   return (
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
-      >
-            <ScrollView contentContainerStyle={{flexGrow: 1}}>
-
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
-
             <Text style={styles.text}>Prénom</Text>
             <TextInput
               style={styles.input}
@@ -186,7 +174,6 @@ React.useEffect(() => {
               {errorMessage} {successMessage}
             </Text>
 
-
             {/*  TODO Affichage conditionnel du boutton lorsque le register est OK. */}
             <TouchableOpacity
               style={styles.button}
@@ -196,8 +183,8 @@ React.useEffect(() => {
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>
-        </ScrollView>
-      </KeyboardAvoidingView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

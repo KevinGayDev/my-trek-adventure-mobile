@@ -88,13 +88,24 @@ export default function Profil({ navigation }) {
     ) {
       setErrorMessage(null);
 
+      let formdata = new FormData();
+      formdata.append("firstName", user.firstName);
+      formdata.append("lastName", user.lastName);
+      formdata.append("mail", user.mail);
+      formdata.append("password", user.password);
+      formdata.append("clientPicture", {
+        name: "profile.jpeg",
+        uri: image,
+        type: "image/jpeg",
+      });
       let options = {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
-        body: JSON.stringify(user),
+        body: formdata,
       };
+
       try {
         const result = await fetch(
           `http://${backServerAddress}:3001/clients/update`,
@@ -188,6 +199,17 @@ export default function Profil({ navigation }) {
               placeholder="Entrer un nouveau de mot de passe si vous souhaiter le changer"
               keyboardType="default"
             />
+
+            <ImagePickerComponent
+              image={image}
+              setImage={setImage}
+              title="Modifier mon Image de profil"
+            />
+            <ImagePickerComponent
+              image={image}
+              setImage={setImage}
+              title="Modifier mon Image de profil"
+            />
             <TouchableOpacity
               style={styles.button}
               onPress={() => handleSubmit()}
@@ -196,12 +218,6 @@ export default function Profil({ navigation }) {
                 Enregistrer les modifications
               </Text>
             </TouchableOpacity>
-
-            <ImagePickerComponent
-              image={image}
-              setImage={setImage}
-              title="Modifier mon Image de profil"
-            />
           </View>
         )}
       </View>

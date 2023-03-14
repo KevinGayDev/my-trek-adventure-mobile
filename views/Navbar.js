@@ -6,19 +6,21 @@ import Treks from "./Treks";
 import Parcours from "./Parcours";
 import Profil from "./Profil";
 import ParcoursSingle from "./ParcoursSingle";
-import { UserConnect } from "../App";
-import { useContext } from "react";
+import TreksSingle from "./TreksSingle";
+
+// import { UserConnect } from "../App";
+// import { useContext } from "react";
 
 // import ParcoursStackNav from "./ParcoursStackNav";
 
 export default function Navbar({navigation}) {
   
   const Tab = createBottomTabNavigator();
-  const {userLog, disconnect} = useContext(UserConnect);
+  // const {userLog, disconnect} = useContext(UserConnect);
 
-  if (!userLog) {
-    disconnect();
-    navigation.navigate("Login");}
+  // if (!userLog) {
+  //   disconnect();
+  //   navigation.navigate("Login");}
   
 
   return (
@@ -70,9 +72,19 @@ export default function Navbar({navigation}) {
 
           tabBarButton: () => null,
         }}
-
-        
       />
+
+<Tab.Screen
+        name="TreksSingle"
+        component={TreksSingle}
+        options={{
+          
+          title: 'Détails du trek',
+        tabBarLabel: "Home",
+
+          tabBarButton: () => null,
+        }}
+      />      
     </Tab.Navigator>
 
   );
