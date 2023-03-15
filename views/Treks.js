@@ -9,7 +9,7 @@ import MapView, {
   UrlTile,
 } from "react-native-maps";
 
-export default function Treks({navigation}) {
+export default function Treks({ navigation }) {
   const { userLog } = useContext(UserConnect);
   // Load the first time
   useEffect(() => {
@@ -66,38 +66,42 @@ export default function Treks({navigation}) {
   //   }
   // }
 
-
   return (
     <View style={styles.container}>
       <View style={styles.myTrekContainer}>
-        <Text style={styles.content}>Mes réservations</Text>
+        <Text style={styles.title}>Mes réservations</Text>
         <View>
           {bookings?.map((booking) => (
             <View key={booking?._id} style={styles.trekItem}>
-             <TouchableOpacity onPress={() =>  navigation.navigate("TreksUser", {
-                slugTrek: booking.slug,
-                parcoursID: booking.parcoursID,
-                guideID: booking.guideID
-              }) }><Text>{booking.trekName}</Text></TouchableOpacity> 
-              {/* <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              // navigation.navigate("ParcoursSingle", { slug : parcours.slug
-              navigation.navigate("TreksSingle", {
-                trekID:  booking._id,
-                slug: slug,
-                slugTrek: booking.slug
-                })
-            }
-          > <Text>{booking.trekName}</Text>
-          </TouchableOpacity> */}
-              <Text>   {booking.trekState}</Text>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("TreksUser", {
+                    slugTrek: booking.slug,
+                    parcoursID: booking.parcoursID,
+                    guideID: booking.guideID,
+                  })
+                }
+              >
+                <Text style={styles.text}>{booking.trekName}</Text>
+              </TouchableOpacity>
+              <Text style={styles.text}> {booking.trekState} </Text>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() =>
+                  navigation.navigate("TreksUser", {
+                    slugTrek: booking.slug,
+                    parcoursID: booking.parcoursID,
+                    guideID: booking.guideID,
+                  })
+                }
+              >
+                <Text style={styles.textbutton}>Detail</Text>
+              </TouchableOpacity>
             </View>
           ))}
         </View>
       </View>
 
-      <Text style={styles.title}>Infos</Text>
 
       <View style={styles.containerMap}>
         <MapView
@@ -117,12 +121,18 @@ export default function Treks({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f1ebe3",
     alignItems: "center",
     justifyContent: "center",
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  title: {
+    color: "#b0a292",
+    fontWeight: "bold",
+    fontSize: 20,
+    margin: 4,
   },
   containerMap: {
     flex: 0.5,
@@ -133,14 +143,36 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   myTrekContainer: {
-    marginVertical: 10,
+    marginVertical: 50,
     borderRadius: 10,
     borderColor: "black",
     borderWidth: 1,
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
     backgroundColor: "white",
   },
   trekItem: {
     flexDirection: "row",
+    justifyContent: "center",
+    alignContent: "center",
+    margin: 10,
   },
+  button: {
+    paddingVertical: 2,
+    paddingHorizontal: 2,
+    alignContent: "center",
+    justifyContent: "center",
+    borderRadius: 16,
+    backgroundColor: "#f89d0e",
+    width: 70,
+    marginHorizontal: 5,
+  },
+  textbutton: {
+    alignSelf: "center",
+    fontSize: 12,
+  },
+  text: {
+    fontSize: 14,
+    fontWeight: "bold"
+  }
 });

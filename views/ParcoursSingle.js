@@ -1,8 +1,17 @@
 import { useState, useEffect, useContext } from "react";
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
 import { UserConnect } from "../App";
+import { Foundation } from "@expo/vector-icons";
+
 
 export default function ParcoursSingle({ route, navigation }) {
   const { slug, id, name } = route.params;
@@ -34,7 +43,7 @@ export default function ParcoursSingle({ route, navigation }) {
       options
     );
     const data = await response.json();
-    // console.log(data);
+    console.log(data);
     if (!data) {
       setParcours({});
       setErrorMessage("Aucun résultat trouvé");
@@ -71,11 +80,13 @@ export default function ParcoursSingle({ route, navigation }) {
       setErrorMessage(null);
     }
   }
-console.log(parcours.parcoursPicture)
+  console.log(parcours.parcoursPicture);
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
         <Text style={styles.title}>{parcours.name}</Text>
+        <Text style={styles.title2}>{parcours.country}</Text>
+
         <Image
           source={{
             uri: `http://${backServerAddress}:3001${parcours.parcoursPicture}`,
@@ -83,54 +94,87 @@ console.log(parcours.parcoursPicture)
           style={styles.image}
         />
         {parcours.duration === 1 ? (
-          <Text>Durée : {parcours.duration} jour</Text>
+          <Text style={styles.highlight} >Durée : {parcours.duration} jour</Text>
         ) : (
-          <Text>Durée : {parcours.duration} jours</Text>
+          <Text style={styles.highlight}>Durée : {parcours.duration} jours</Text>
         )}
-        <Text>Prix :{parcours.price} €</Text>
-        <Text>Difficulté: {parcours.difficulty}</Text>
-        <Text>Détail du parcours</Text>
-        <Text>{parcours.description}</Text>
-        <Text>Les étapes : </Text>
+       
+
+
+        {parcours.difficulty === 1 && (
+                <Text style={styles.highlight}>
+                  Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />
+                </Text>
+              )}
+
+              {parcours.difficulty === 2 && (
+                <Text style={styles.highlight}>
+                  Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+                  <Foundation name="foot" size={16} color={"#f1ebe3"} />
+                </Text>
+              )}
+              {parcours.difficulty === 3 && (
+                <Text style={styles.highlight}>
+                  Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+                  <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+                  <Foundation name="foot" size={16} color={"#f1ebe3"} />
+                </Text>
+              )}
+
+<Text style={styles.priceText}>{parcours.price} €</Text>
+
+<Text style={styles.title3}>Prochains départs</Text>
+
+{treks?.map((trek) => (
+          <View key={trek?._id} style={styles.trek}>
+            <View >
+              <Image />
+            </View>
+            <View >
+              <Text style={styles.trekTitle}>{trek?.beginDate}</Text>
+              <Text style={styles.trekDescription}>{trek?.trekName}</Text>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() =>
+                  // navigation.navigate("ParcoursSingle", { slug : parcours.slug
+                  navigation.navigate("TreksSingle", {
+                    trekID: trek._id,
+                    slug: slug,
+                    slugTrek: trek.slug,
+                  })
+                }
+              >
+                <Text style={styles.textbutton}>Réserver</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+
+
+        <Text style={styles.title3}>Détail du parcours</Text>
+        <Text style={styles.stepDescription}>{parcours.description}</Text>
+        <Text style={styles.title3}>Les étapes</Text>
         {parcours?.steps?.map((step) => (
           <View key={step._id} style={styles.step}>
-            <View style={styles.left}>
-              <Image
-                source={{
-                  uri: `http://${backServerAddress}:3001${step.stepPicture}`,
-                }}
-                style={styles.stepImage}
-              />
+            <View style={styles.stepTop}>
+              <View style={styles.left}>
+                <Text style={styles.stepTitle}>{step.stepName}</Text>
+              </View>
+              <View style={styles.left}>
+                <Image
+                  source={{
+                    uri: `http://${backServerAddress}:3001${step.stepPicture}`,
+                  }}
+                  style={styles.stepImage}
+                />
+              </View>
             </View>
             <View style={styles.right}>
               <Text style={styles.stepDescription}>{step.stepDescription}</Text>
             </View>
           </View>
         ))}
-        {treks?.map((trek) => (
-          <View key={trek?._id} style={styles.step}>
-            <View style={styles.left}>
-              <Image
-              />
-            </View>
-            <View style={styles.right}>
-              <Text style={styles.stepTitle}>{trek?.beginDate}</Text>
-              <Text style={styles.stepDescription}>{trek?.trekName}</Text>
-              <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              // navigation.navigate("ParcoursSingle", { slug : parcours.slug
-              navigation.navigate("TreksSingle", {
-                trekID:  trek._id,
-                slug: slug,
-                slugTrek: trek.slug
-                })
-            }
-          ><Text style={styles.textbutton}>Réserver</Text>
-          </TouchableOpacity>
-            </View>
-          </View>
-        ))}
+
       </View>
     </ScrollView>
   );
@@ -144,42 +188,80 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   stepContainer: {
-    backgroundColor: "pink",
+  },
+  stepTop: {
+    flexDirection: "row",
   },
   title: {
     fontSize: 30,
     fontWeight: "bold",
     marginVertical: 10,
   },
+  title2: {
+    fontSize: 22,
+  },
+  title3: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginVertical: 10,
+  },
   stepTitle: {
     fontSize: 16,
     fontWeight: "bold",
+    // alignSelf: "center",
+    margin: 20,
+    flex: 1
   },
-
+  highlight: {
+    backgroundColor: "#b0a292",
+    marginVertical: 4,
+    color: "#f1ebe3",
+    fontWeight: "bold",
+    paddingHorizontal: 16,
+    paddingVertical: 2,
+    borderRadius: 12,
+  },
   image: {
     width: 300,
     height: 300,
     marginVertical: 20,
+    borderRadius: 12,
   },
   stepImage: {
-    width: 100,
-    height: 100,
-    marginHorizontal: 20,
+    width: 150,
+    height: 150,
+    margin: 20,
+    borderRadius: 8,
   },
   step: {
     marginVertical: 10,
-    flexDirection: "row",
+    // flexDirection: "row",
     justifyContent: "center",
     alignContent: "center",
+    borderWidth: 1,
+    margin: 10,
+    borderRadius: 12,
+    backgroundColor: "#f1ebe3",
+
+
   },
   right: {
-    flex: 1,
-    backgroundColor: "pink",
+    // flex: 1,
+    // backgroundColor: "pink",
+    alignContent: 'center',
+
   },
   left: {
-    backgroundColor: "yellow",
+    // backgroundColor: "yellow",
     justifyContent: "center",
+    flex: 1,
   },
-
-  // stepDescription: {},
+  stepDescription: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    textAlign: "justify",
+  },
+  priceText: {
+    fontWeight: "bold",
+  },
 });

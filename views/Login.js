@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
+  Image
 } from "react-native";
 import * as React from "react";
 import { useState, useContext } from "react";
@@ -83,7 +84,14 @@ export default function Login({ navigation }) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
+
+
+        
+          <View style={styles.container}>
+          <Image
+          source={require("../assets/logo.png")}
+          style={styles.image}
+        />
           <Text>Identifiant</Text>
           <TextInput
             style={styles.input}
@@ -147,7 +155,7 @@ const styles = StyleSheet.create({
   // },
   container: {
     flex: 1,
-    backgroundColor: "#00a5a7",
+    backgroundColor: '#f1ebe3',
     alignItems: "center",
     justifyContent: "center",
   },
@@ -173,4 +181,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontSize: 16,
   },
+  image: {
+    width: 250,
+    resizeMode: 'contain',
+  }
 });
