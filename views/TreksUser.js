@@ -61,7 +61,7 @@ export default function TreksUser({ route, navigation }) {
       // displayTreks()
     }
   }
-  console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXX3", parcoursSteps[0]);
+  console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXX3", parcoursSteps);
 
   // Display all the treks available for one parcours
   async function getTreks() {
