@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Image, View, StyleSheet, Platform } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import React, { useState, useEffect } from "react";
+import { Button, Image, View, StyleSheet, Platform } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
-export default function ImagePickerComponent({image, setImage, title= "Sélectionner une image" }) {
+export default function ImagePickerComponent({
+  image,
+  setImage,
+  title = "Sélectionner une image",
+}) {
   // const [image, setImage] = useState(null);
 
   const pickImage = async () => {
@@ -22,11 +26,10 @@ export default function ImagePickerComponent({image, setImage, title= "Sélectio
   };
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ alignItems: "center", justifyContent: "center" }}>
       <Button title={title} onPress={pickImage} style={styles.button} />
-      {image && <Image source={{ uri: image }}  style={styles.image}  />}
-      
-      {image && <Button title='Envoyer' ></Button>}
+      {image && <Image source={{ uri: image }} style={styles.image} />}
+      {image && <Button title="Envoyer"></Button>}
     </View>
   );
 }
@@ -34,6 +37,7 @@ export default function ImagePickerComponent({image, setImage, title= "Sélectio
 const styles = StyleSheet.create({
   image: {
     margin: 20,
-    width: 200, 
-    height: 200 
-  } })
+    width: 200,
+    height: 200,
+  },
+});

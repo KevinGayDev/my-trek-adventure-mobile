@@ -140,6 +140,8 @@ export default function ParcoursSingle({ route, navigation }) {
             </View>
             <View style={styles.trekItem} >
               <Text style={styles.trekTitle}>{trek?.beginDate}</Text>
+              <Text style={styles.trekTitle}>{trek?.endDate}</Text>
+
               <Text style={styles.trekDescription}>{trek?.trekName}</Text>
               <TouchableOpacity
                 style={styles.button}

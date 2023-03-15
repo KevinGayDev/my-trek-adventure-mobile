@@ -25,7 +25,7 @@ export default function Profil({ navigation }) {
   const { userLog, disconnect } = useContext(UserConnect);
 
   const [errorMessage, setErrorMessage] = useState(null);
-
+  const [successMessage, setSuccessMessage] = useState(null);
 
   const [userDetail, setUserDetail] = useState({
     firstName: "",
@@ -76,6 +76,8 @@ export default function Profil({ navigation }) {
 
   // Submit change to server and DB
   async function handleSubmit() {
+    const token = await SecureStore.getItemAsync("token");
+
     if (
       userDetail.firstName === "" ||
       userDetail.lastName === "" ||
@@ -95,16 +97,21 @@ export default function Profil({ navigation }) {
       formdata.append("firstName", userDetail.firstName);
       formdata.append("lastName", userDetail.lastName);
       formdata.append("mail", userDetail.mail);
-      formdata.append("password", userDetail.password);
-      formdata.append("clientPicture", {
-        name: "profile.jpeg",
-        uri: image,
-        type: "image/jpeg",
-      });
+      if (userDetail.password) {
+        formdata.append("password", userDetail.password);
+      }
+      if (image) {
+        formdata.append("clientPicture", {
+          name: "profile.jpeg",
+          uri: image,
+          type: "image/jpeg",
+        });
+      }
       let options = {
         method: "PUT",
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: "bearer " + token,
         },
         body: formdata,
       };
@@ -121,13 +128,13 @@ export default function Profil({ navigation }) {
         // retreive token
         // const token = data.token;
         if (data.success) {
-          setsuccessMessage(data.message);
+          setSuccessMessage(data.message);
           setErrorMessage(null);
           // TODO
           // setUserLog(data.user);
         } else if (!data.success) {
           setErrorMessage(data.message);
-          setsuccessMessage(null);
+          setSuccessMessage(null);
         }
       } catch (error) {
         console.error(error);
@@ -140,10 +147,10 @@ export default function Profil({ navigation }) {
       {/* <ImageBackground source={require("../assets/nik-shuliahin-rkFIIE9PxH0-unsplash.jpg")}  style={{flex:1, }}> */}
 
       <View style={styles.container}>
-        {userDetail?.profilePicture !== "" && (
+        {userDetail?.clientPicture !== "" && (
           <Image
             style={styles.profilePicture}
-            source={{ uri: userDetail.profilePicture }}
+            source={{ uri: `http://${backServerAddress}:3001${userDetail.clientPicture}`}}
           />
         )}
 
@@ -202,6 +209,11 @@ export default function Profil({ navigation }) {
               placeholder="Entrer un nouveau de mot de passe si vous souhaiter le changer"
               keyboardType="default"
             />
+            <ImagePickerComponent
+              image={image}
+              setImage={setImage}
+              title="Modifier mon Image de profil"
+            />
             <TouchableOpacity
               style={styles.button}
               onPress={() => handleSubmit()}
@@ -210,13 +222,6 @@ export default function Profil({ navigation }) {
                 Enregistrer les modifications
               </Text>
             </TouchableOpacity>
-
-            {/* <ImagePickerComponent
-              image={image}
-              setImage={setImage}
-              title="Modifier mon Image de profil"
-            /> */}
-
           </View>
         )}
       </View>
@@ -230,13 +235,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-    backgroundColor: "white",
+    backgroundColor: "#f1ebe3",
     margin: 20,
     borderRadius: 16,
   },
   containerScroll: {
     flexGrow: 1,
-    backgroundColor: "lightblue",
+    backgroundColor: "#f3f2ef",
   },
 
   profilePicture: {
