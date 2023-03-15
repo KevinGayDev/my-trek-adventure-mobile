@@ -1,12 +1,21 @@
 import { useState, useEffect, useContext } from "react";
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
 import { UserConnect } from "../App";
 
-export default function ParcoursSingle({ route, navigation }) {
-  const { slug, id, name } = route.params;
+export default function TreksSingle({ route, navigation }) {
+  const { trekID, slug, slugTrek } = route.params;
   const { userLog } = useContext(UserConnect);
+
+  console.log(slugTrek);
 
   // retreive parcours details from server
   const [parcours, setParcours] = useState({});
@@ -34,7 +43,6 @@ export default function ParcoursSingle({ route, navigation }) {
       options
     );
     const data = await response.json();
-    // console.log(data);
     if (!data) {
       setParcours({});
       setErrorMessage("Aucun résultat trouvé");
@@ -49,6 +57,7 @@ export default function ParcoursSingle({ route, navigation }) {
   // Display all the treks available for one parcours
   async function getTreks() {
     const token = await SecureStore.getItemAsync("token");
+    console.log("token", token);
     const options = {
       method: "GET",
       headers: {
@@ -58,10 +67,11 @@ export default function ParcoursSingle({ route, navigation }) {
       },
     };
     const response = await fetch(
-      `http://${backServerAddress}:3001/treks/get/${slug}`,
+      `http://${backServerAddress}:3001/treks/${slugTrek}`,
       options
     );
     const data = await response.json();
+    console.log(data);
     if (!data) {
       setTreks({});
       setErrorMessage("Aucun résultat trouvé");
@@ -71,14 +81,53 @@ export default function ParcoursSingle({ route, navigation }) {
       setErrorMessage(null);
     }
   }
-console.log(parcours.parcoursPicture)
+
+  // Send Bookings to server
+  async function putBooking() {
+    const token = await SecureStore.getItemAsync("token");
+    const options = {
+      method: "PUT",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({ trekID: trekID }),
+    };
+
+    const response = await fetch(
+      `http://${backServerAddress}:3001/bookings/add`,
+      options
+    );
+    const data = await response.json();
+    if (!data) {
+      setParcours({});
+      setErrorMessage("Aucun résultat trouvé");
+    }
+    if (data) {
+      setParcours(data);
+      setErrorMessage(null);
+    }
+  }
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
         <Text style={styles.title}>{parcours.name}</Text>
+        <Text style={styles.stepDescription}>{treks?.trekName}</Text>
+   
+        <Text style={styles.stepTitle}>{treks?.beginDate}</Text>
+        <Text style={styles.stepTitle}>{treks?.endDate}</Text>
+        <Text>Prix :{parcours.price} €</Text>
+        <TouchableOpacity style={styles.button} onPress={() => putBooking()}>
+          <Text style={styles.textbutton}>Réserver et Payer</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* <View style={styles.container}>
         <Image
           source={{
-            uri: `http://${backServerAddress}:3001${parcours.parcoursPicture}`,
+            uri: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Oldoinyolengai.jpg",
           }}
           style={styles.image}
         />
@@ -97,7 +146,7 @@ console.log(parcours.parcoursPicture)
             <View style={styles.left}>
               <Image
                 source={{
-                  uri: `http://${backServerAddress}:3001${step.stepPicture}`,
+                  uri: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Oldoinyolengai.jpg",
                 }}
                 style={styles.stepImage}
               />
@@ -120,18 +169,19 @@ console.log(parcours.parcoursPicture)
             style={styles.button}
             onPress={() =>
               // navigation.navigate("ParcoursSingle", { slug : parcours.slug
-              navigation.navigate("TreksSingle", {
-                trekID:  trek._id,
-                slug: slug,
-                slugTrek: trek.slug
-                })
+              navigation.navigate("TrekSingle", {
+                iD: trek._id,
+                name: trek.trekName,
+                slug: trek._id,
+                // userID: METTRE ICI La donnée à renvoyer dans la page parcours Single.
+              })
             }
           ><Text style={styles.textbutton}>Réserver</Text>
           </TouchableOpacity>
             </View>
           </View>
         ))}
-      </View>
+      </View> */}
     </ScrollView>
   );
 }
@@ -180,6 +230,19 @@ const styles = StyleSheet.create({
     backgroundColor: "yellow",
     justifyContent: "center",
   },
-
+  button: {
+    backgroundColor: "#a92e34",
+    paddingVertical: 8,
+    paddingHorizontal: 24,
+    alignContent: "center",
+    justifyContent: "center",
+    borderRadius: 16,
+    margin: 36,
+  },
+  textbutton: {
+    color: "white",
+    alignSelf: "center",
+    fontSize: 16,
+  },
   // stepDescription: {},
 });
