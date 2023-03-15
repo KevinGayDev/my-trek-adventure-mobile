@@ -71,7 +71,7 @@ export default function Treks({navigation}) {
     <View style={styles.container}>
       <View style={styles.myTrekContainer}>
         <Text style={styles.content}>Mes réservations</Text>
-        <View style={styles.trekItem}>
+        <View>
           {bookings?.map((booking) => (
             <View key={booking?._id} style={styles.trekItem}>
              <TouchableOpacity onPress={() =>  navigation.navigate("TreksUser", {
@@ -91,7 +91,7 @@ export default function Treks({navigation}) {
             }
           > <Text>{booking.trekName}</Text>
           </TouchableOpacity> */}
-              <Text>{booking.trekState}</Text>
+              <Text>   {booking.trekState}</Text>
             </View>
           ))}
         </View>
