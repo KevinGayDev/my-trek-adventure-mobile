@@ -49,7 +49,7 @@ export default function ParcoursList({ navigation }) {
       setErrorMessage(null);
     }
   }
-
+console.log(parcoursList)
   return (
     <View style={styles.containerParcours}>
       {parcoursList.map((parcours) => (
@@ -57,7 +57,7 @@ export default function ParcoursList({ navigation }) {
           <View style={styles.parcoursTop}>
             <Image
               source={{
-                uri: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Oldoinyolengai.jpg",
+                uri:`http://${backServerAddress}:3001${parcours.parcoursPicture}`,
               }}
               style={{ width: 100, height: 100 }}
             />
@@ -72,14 +72,12 @@ export default function ParcoursList({ navigation }) {
               )}
                   <Text>Niveau : {parcours.difficulty}</Text>
               <Text>Prix : {parcours.price} €</Text>
-             
-              <Text>Prochain départ le: {parcours.difficulty}</Text>
-              
+                          
             </View>
           </View>
 
           <View style={styles.parcoursBottom}>
-            <Text style={styles.textDescription}>{parcours.description}</Text>
+            <Text numberOfLines={3} style={styles.textDescription}>{parcours.description}</Text>
           </View>
 
           <TouchableOpacity

@@ -24,6 +24,9 @@ export default function Profil({ navigation }) {
   // Pass context to check if user is logged or not
   const { userLog, disconnect } = useContext(UserConnect);
 
+  const [errorMessage, setErrorMessage] = useState(null);
+
+
   const [userDetail, setUserDetail] = useState({
     firstName: "",
     lastName: "",
@@ -68,31 +71,31 @@ export default function Profil({ navigation }) {
 
   // Update user detail const from Input
   function handleChange(label, value) {
-    setUser({ ...user, [label]: value });
+    setUserDetail({ ...userDetail, [label]: value });
   }
 
   // Submit change to server and DB
   async function handleSubmit() {
     if (
-      user.firstName === "" ||
-      user.lastName === "" ||
+      userDetail.firstName === "" ||
+      userDetail.lastName === "" ||
       // user.password === "" ||
-      user.mail === ""
+      userDetail.mail === ""
     ) {
       setErrorMessage(`Un ou plusieurs champ(s) manquant(s)`);
     } else if (
-      user.firstName !== "" &&
-      user.lastName !== "" &&
+      userDetail.firstName !== "" &&
+      userDetail.lastName !== "" &&
       // user.password !== "" &&
-      user.mail
+      userDetail.mail
     ) {
       setErrorMessage(null);
 
       let formdata = new FormData();
-      formdata.append("firstName", user.firstName);
-      formdata.append("lastName", user.lastName);
-      formdata.append("mail", user.mail);
-      formdata.append("password", user.password);
+      formdata.append("firstName", userDetail.firstName);
+      formdata.append("lastName", userDetail.lastName);
+      formdata.append("mail", userDetail.mail);
+      formdata.append("password", userDetail.password);
       formdata.append("clientPicture", {
         name: "profile.jpeg",
         uri: image,
@@ -168,7 +171,7 @@ export default function Profil({ navigation }) {
               style={styles.input}
               // onChangeText={onChangeNumber}
               value={userDetail.firstName}
-              onChangeText={(value) => handleChange("lastName", value)}
+              onChangeText={(value) => handleChange("firstName", value)}
               placeholder="Votre Nom"
               keyboardType="default"
             />
@@ -187,7 +190,7 @@ export default function Profil({ navigation }) {
             <TextInput
               style={styles.input}
               value={userDetail.mail}
-              onChangeText={(value) => handleChange("lastName", value)}
+              onChangeText={(value) => handleChange("mail", value)}
               placeholder="Votre Nom"
               keyboardType="default"
             />
@@ -195,20 +198,9 @@ export default function Profil({ navigation }) {
             <Text style={styles.text}>Votre Mot de passe</Text>
             <TextInput
               style={styles.input}
-              onChangeText={(value) => handleChange("lastName", value)}
+              onChangeText={(value) => handleChange("password", value)}
               placeholder="Entrer un nouveau de mot de passe si vous souhaiter le changer"
               keyboardType="default"
-            />
-
-            <ImagePickerComponent
-              image={image}
-              setImage={setImage}
-              title="Modifier mon Image de profil"
-            />
-            <ImagePickerComponent
-              image={image}
-              setImage={setImage}
-              title="Modifier mon Image de profil"
             />
             <TouchableOpacity
               style={styles.button}
@@ -218,6 +210,13 @@ export default function Profil({ navigation }) {
                 Enregistrer les modifications
               </Text>
             </TouchableOpacity>
+
+            {/* <ImagePickerComponent
+              image={image}
+              setImage={setImage}
+              title="Modifier mon Image de profil"
+            /> */}
+
           </View>
         )}
       </View>
