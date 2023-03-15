@@ -11,7 +11,10 @@ import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
 import { UserConnect } from "../App";
 import { Foundation } from "@expo/vector-icons";
+import MapView, {
 
+} from "react-native-maps";
+import { Marker } from "react-native-maps";
 
 export default function ParcoursSingle({ route, navigation }) {
   const { slug, id, name } = route.params;
@@ -20,6 +23,7 @@ export default function ParcoursSingle({ route, navigation }) {
   // retreive parcours details from server
   const [parcours, setParcours] = useState({});
   const [treks, setTreks] = useState([]);
+  const [parcoursSteps, setParcoursSteps] = useState([]);
 
   const [errorMessage, setErrorMessage] = useState(null);
   useEffect(() => {
@@ -50,6 +54,8 @@ export default function ParcoursSingle({ route, navigation }) {
     }
     if (data) {
       setParcours(data);
+      setParcoursSteps(data.steps);
+
       setErrorMessage(null);
       // displayTreks()
     }
@@ -125,13 +131,17 @@ export default function ParcoursSingle({ route, navigation }) {
 
 <Text style={styles.title3}>Prochains départs</Text>
 
+<View style={styles.step} > 
+
 {treks?.map((trek) => (
           <View key={trek?._id} style={styles.trek}>
             <View >
               <Image />
             </View>
-            <View >
+            <View style={styles.trekItem} >
               <Text style={styles.trekTitle}>{trek?.beginDate}</Text>
+              <Text style={styles.trekTitle}>{trek?.endDate}</Text>
+
               <Text style={styles.trekDescription}>{trek?.trekName}</Text>
               <TouchableOpacity
                 style={styles.button}
@@ -149,7 +159,7 @@ export default function ParcoursSingle({ route, navigation }) {
             </View>
           </View>
         ))}
-
+</View>
 
         <Text style={styles.title3}>Détail du parcours</Text>
         <Text style={styles.stepDescription}>{parcours.description}</Text>
@@ -175,6 +185,30 @@ export default function ParcoursSingle({ route, navigation }) {
           </View>
         ))}
 
+<View style={styles.containerMap}>
+        <MapView
+          style={styles.map}
+          region={{
+            latitude: parcoursSteps[0]?.stepLatitude,
+            longitude: parcoursSteps[0]?.stepLongitude,
+            latitudeDelta: 3,
+            longitudeDelta: 3,
+          }}
+        >
+          {parcoursSteps.map((marker) => (
+            <Marker
+              key={marker.stepLatitude}
+              coordinate={{
+                latitude: marker.stepLatitude,
+                longitude: marker.stepLongitude,
+              }}
+              title={marker.stepName}
+              description={marker.stepDescription}
+              pinColor="black"
+            />
+          ))}
+    </MapView>
+    </View>
       </View>
     </ScrollView>
   );
@@ -264,4 +298,18 @@ const styles = StyleSheet.create({
   priceText: {
     fontWeight: "bold",
   },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  containerMap: {
+    // ...StyleSheet.absoluteFillObject,
+    marginTop: 20,
+    height: 400,
+    width: 400,
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  trekItem: {
+    flexDirection: 'row'
+  }
 });

@@ -11,12 +11,9 @@ import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
 import { UserConnect } from "../App";
 import MapView, {
-  MAP_TYPES,
-  PROVIDER_DEFAULT,
-  UrlTile,
+
 } from "react-native-maps";
 import { Marker } from "react-native-maps";
-import { Polyline } from "react-native-maps";
 
 export default function TreksUser({ route, navigation }) {
   const { trekID, slug, slugTrek, parcoursID } = route.params;
@@ -133,8 +130,8 @@ export default function TreksUser({ route, navigation }) {
           region={{
             latitude: parcoursSteps[0]?.stepLatitude,
             longitude: parcoursSteps[0]?.stepLongitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitudeDelta: 0.8,
+            longitudeDelta: 0.8,
           }}
         >
           {/* Custom OSM Tile */}
@@ -153,15 +150,6 @@ export default function TreksUser({ route, navigation }) {
             />
           ))}
 
-{/* {parcoursSteps.map((marker) => (
-  <Polyline
-        coordinates={{latitude: marker.stepLatitude,
-          longitude: marker.stepLongitude,}} //specify our coordinates
-        strokeColor={"#000"}
-        strokeWidth={3}
-        lineDashPattern={[1]}
-      />
-          ))} */}
 
 
         </MapView>
