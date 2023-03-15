@@ -69,39 +69,53 @@ export default function Treks({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.myTrekContainer}>
-        <Text style={styles.title}>Mes réservations</Text>
-        <View>
-          {bookings?.map((booking) => (
-            <View key={booking?._id} style={styles.trekItem}>
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("TreksUser", {
-                    slugTrek: booking.slug,
-                    parcoursID: booking.parcoursID,
-                    guideID: booking.guideID,
-                  })
-                }
-              >
-                <Text style={styles.text}>{booking.trekName}</Text>
-              </TouchableOpacity>
-              <Text style={styles.text}> {booking.trekState} </Text>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() =>
-                  navigation.navigate("TreksUser", {
-                    slugTrek: booking.slug,
-                    parcoursID: booking.parcoursID,
-                    guideID: booking.guideID,
-                  })
-                }
-              >
-                <Text style={styles.textbutton}>Detail</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
+        <Text style={styles.title}> {bookings?.length !== 0 ? "Mes réservations" : "Ma réservation" } {bookings?.length > 1 && <Text style={{fontSize:16}}>{`(${bookings?.length})`}</Text>}</Text>
+        {bookings.length !== 0 ? (
+          <View>
+            {bookings?.map((booking) => (
+              <View key={booking?._id} style={styles.trekItem}>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("TreksUser", {
+                      slugTrek: booking.slug,
+                      parcoursID: booking.parcoursID,
+                      guideID: booking.guideID,
+                    })
+                  }
+                >
+                  <Text style={styles.text}>{booking.trekName}</Text>
+                </TouchableOpacity>
+                <Text style={styles.text}> {booking.trekState} </Text>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() =>
+                    navigation.navigate("TreksUser", {
+                      slugTrek: booking.slug,
+                      parcoursID: booking.parcoursID,
+                      guideID: booking.guideID,
+                    })
+                  }
+                >
+                  <Text style={styles.textbutton}>Detail</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <View>
+            <Text style={styles.text}>Vous n'avez pas encore reservé de trek</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() =>
+                navigation.navigate("Parcours", {
+                })
+              }
+            >
+              <Text style={styles.textbutton}>Découvrez nos offres</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
-
 
       <View style={styles.containerMap}>
         <MapView
@@ -173,6 +187,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 14,
-    fontWeight: "bold"
-  }
+    fontWeight: "bold",
+  },
 });
