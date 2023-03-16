@@ -11,6 +11,7 @@ import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
 import { UserConnect } from "../App";
 import { Foundation } from "@expo/vector-icons";
+import { format } from 'date-fns'
 import MapView, {
 
 } from "react-native-maps";
@@ -27,8 +28,8 @@ export default function ParcoursSingle({ route, navigation }) {
 
   const [errorMessage, setErrorMessage] = useState(null);
   useEffect(() => {
-    getParcours();
     getTreks();
+    getParcours();
   }, [slug]);
 
   // Retreive One parcours from server
@@ -139,10 +140,11 @@ export default function ParcoursSingle({ route, navigation }) {
               <Image />
             </View>
             <View style={styles.trekItem} >
-              <Text style={styles.trekTitle}>{trek?.beginDate}</Text>
-              <Text style={styles.trekTitle}>{trek?.endDate}</Text>
+              <Text style={styles.trekTitle}>du {format(new Date(trek?.beginDate), 'dd/MM/yyyy')}</Text>
+              <Text style={styles.trekTitle}> au {format(new Date(trek?.endDate), 'dd/MM/yyyy')}</Text>
 
-              <Text style={styles.trekDescription}>{trek?.trekName}</Text>
+             
+              {/* <Text style={styles.trekDescription}>{trek?.trekName}</Text> */}
               <TouchableOpacity
                 style={styles.button}
                 onPress={() =>
@@ -310,6 +312,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   trekItem: {
-    flexDirection: 'row'
-  }
+    flexDirection: 'row',
+    marginVertical: 10,
+  },
+  trek: {
+paddingHorizontal: 16,
+  },
+  button: {
+    paddingVertical: 2,
+    paddingHorizontal: 2,
+    alignContent: "center",
+    justifyContent: "center",
+    borderRadius: 16,
+    backgroundColor: "#f89d0e",
+    width: 70,
+    marginHorizontal: 6,
+  },
+  textbutton: {
+    alignSelf: "center",
+    fontSize: 12,
+  },
 });

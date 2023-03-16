@@ -96,7 +96,7 @@ export default function Treks({ navigation }) {
                     })
                   }
                 >
-                  <Text style={styles.textbutton}>Detail</Text>
+                  <Text style={styles.textbutton}>Détail</Text>
                 </TouchableOpacity>
               </View>
             ))}
