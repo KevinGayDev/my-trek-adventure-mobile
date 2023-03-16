@@ -13,7 +13,8 @@ import * as React from "react";
 import { useState, useContext } from "react";
 import * as SecureStore from "expo-secure-store";
 import backServerAddress from "../config";
-import { UserConnect } from "../App";
+// import { UserConnect } from "../App";
+import UserConnect  from "../Context";
 
 export default function Login({ navigation }) {
   const { setUserLog } = useContext(UserConnect);
@@ -130,7 +131,7 @@ export default function Login({ navigation }) {
             style={styles.button}
             onPress={() => navigation.navigate("Register")}
           >
-            <Text style={styles.textbutton}>Pas encore inscrit</Text>
+            <Text style={styles.textbutton}>S'enregistrer</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}

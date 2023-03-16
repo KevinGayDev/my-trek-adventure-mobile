@@ -182,7 +182,7 @@ export default function Register({ navigation }) {
               style={styles.button}
               onPress={() => navigation.navigate("Login")}
             >
-              <Text>Vers la page de connexion </Text>
+              <Text style={styles.textbutton}>Vers la page de connexion </Text>
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>

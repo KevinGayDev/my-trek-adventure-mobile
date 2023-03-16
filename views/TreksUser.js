@@ -1,18 +1,13 @@
 import { useState, useEffect, useContext } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
-import * as Location from 'expo-location';
-import { UserConnect } from "../App";
+import * as Location from "expo-location";
+// import { UserConnect } from "../App";
+import UserConnect from "../Context";
 import MapView from "react-native-maps";
 import { Marker } from "react-native-maps";
-import { format } from 'date-fns'
-
+import { format } from "date-fns";
 
 export default function TreksUser({ route, navigation }) {
   const { trekID, slug, slugTrek, parcoursID } = route.params;
@@ -23,7 +18,7 @@ export default function TreksUser({ route, navigation }) {
   const [parcoursSteps, setParcoursSteps] = useState([]);
   const [treks, setTreks] = useState({
     beginDate: "2023-03-14T17:14:13.951Z",
-    endDate: "2023-03-14T17:14:13.951Z"
+    endDate: "2023-03-14T17:14:13.951Z",
   });
   const [guide, setGuide] = useState({});
   const [location, setLocation] = useState(null);
@@ -108,7 +103,7 @@ export default function TreksUser({ route, navigation }) {
 
   async function getUserPosition() {
     let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
+    if (status !== "granted") {
       setErrorMsg("L'application n'a pas pu accéder à votre position");
       return;
     }
@@ -120,10 +115,32 @@ export default function TreksUser({ route, navigation }) {
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
         <Text style={styles.title}>{parcours.name}</Text>
-        <Text>départ le : </Text><Text style={styles.stepTitle}>{format(new Date(treks?.beginDate), 'dd/MM/yyyy')}</Text>
-        <Text>arrivée le : </Text><Text style={styles.stepTitle}>{format(new Date(treks?.endDate), 'dd/MM/yyyy')}</Text>
-        {guide && <View><Text>Guide : </Text><Text style={styles.stepTitle}>{guide?.firstName} {guide?.lastName}</Text></View>}
+        <Text>départ le : </Text>
+        <Text style={styles.stepTitle}>
+          {format(new Date(treks?.beginDate), "dd/MM/yyyy")}
+        </Text>
+        <Text>arrivée le : </Text>
+        <Text style={styles.stepTitle}>
+          {format(new Date(treks?.endDate), "dd/MM/yyyy")}
+        </Text>
+        {guide && (
+          <View>
+            <Text>Guide : </Text>
+            <Text style={styles.stepTitle}>
+              {guide?.firstName} {guide?.lastName}
+            </Text>
+          </View>
+        )}
+
+        <View style={styles.progressionContainer}>
+
+          <Text style={[styles.stepTitle, {marginBottom: 10}]}> Votre progression</Text>
+          {parcoursSteps.map((step) => (
+            <Text> {step.stepName}</Text>
+          ))}
+        </View>
       </View>
+
       <View style={styles.containerMap}>
         <MapView
           style={styles.map}
@@ -149,77 +166,21 @@ export default function TreksUser({ route, navigation }) {
           ))}
 
           {/* User marker */}
-          {location && (<Marker
-            // key={index}
-            coordinate={{
-              latitude: location?.coords?.latitude,
-              longitude: location?.coords?.longitude,
-            }}
-            title="Ma position actuelle"
-            /*description={marker.stepDescription}*/
-            pinColor="green"
-          />)}
-
+          {location && (
+            <Marker
+              // key={index}
+              coordinate={{
+                latitude: location?.coords?.latitude,
+                longitude: location?.coords?.longitude,
+              }}
+              title="Ma position actuelle"
+              /*description={marker.stepDescription}*/
+              pinColor="green"
+            />
+          )}
         </MapView>
       </View>
-      {/* <View style={styles.container}>
-        <Image
-          source={{
-            uri: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Oldoinyolengai.jpg",
-          }}
-          style={styles.image}
-        />
-        {parcours.duration === 1 ? (
-          <Text>Durée : {parcours.duration} jour</Text>
-        ) : (
-          <Text>Durée : {parcours.duration} jours</Text>
-        )}
-        <Text>Prix :{parcours.price} €</Text>
-        <Text>Difficulté: {parcours.difficulty}</Text>
-        <Text>Détail du parcours</Text>
-        <Text>{parcours.description}</Text>
-        <Text>Les étapes : </Text>
-        {parcours?.steps?.map((step) => (
-          <View key={step._id} style={styles.step}>
-            <View style={styles.left}>
-              <Image
-                source={{
-                  uri: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Oldoinyolengai.jpg",
-                }}
-                style={styles.stepImage}
-              />
-            </View>
-            <View style={styles.right}>
-              <Text style={styles.stepDescription}>{step.stepDescription}</Text>
-            </View>
-          </View>
-        ))}
-        {treks?.map((trek) => (
-          <View key={trek?._id} style={styles.step}>
-            <View style={styles.left}>
-              <Image
-              />
-            </View>
-            <View style={styles.right}>
-              <Text style={styles.stepTitle}>{trek?.beginDate}</Text>
-              <Text style={styles.stepDescription}>{trek?.trekName}</Text>
-              <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              // navigation.navigate("ParcoursSingle", { slug : parcours.slug
-              navigation.navigate("TrekSingle", {
-                iD: trek._id,
-                name: trek.trekName,
-                slug: trek._id,
-                // userID: METTRE ICI La donnée à renvoyer dans la page parcours Single.
-              })
-            }
-          ><Text style={styles.textbutton}>Réserver</Text>
-          </TouchableOpacity>
-            </View>
-          </View>
-        ))}
-      </View> */}
+      
     </ScrollView>
   );
 }
@@ -227,9 +188,16 @@ export default function TreksUser({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
+    backgroundColor: "#f1ebe3",   
+     alignItems: "center",
     justifyContent: "flex-start",
+  },
+  progressionContainer: {
+    borderWidth: 1,
+    padding: 16,
+    borderRadius: 8,
+    margin: 12,
+    backgroundColor: "white"
   },
   stepContainer: {
     backgroundColor: "pink",

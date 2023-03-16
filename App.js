@@ -7,10 +7,11 @@ import Navbar from "./views/Navbar";
 import * as React from "react";
 import * as SecureStore from "expo-secure-store";
 import backServerAddress from "./config";
+import UserConnect from "./Context"
 
 import { StatusBar } from "expo-status-bar";
 
-export const UserConnect = React.createContext();
+// export const UserConnect = React.createContext();
 
 export default function App() {
   React.useEffect(() => {
@@ -18,9 +19,6 @@ export default function App() {
   }, []);
 
   const [userLog, setUserLog] = React.useState([]);
-
-
-
 
   // Logout
  function disconnect() {
