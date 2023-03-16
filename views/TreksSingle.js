@@ -30,35 +30,7 @@ export default function TreksSingle({ route, navigation }) {
 
   useEffect(() => {
     getTreks();
-    getParcours();
-    // getGuide();
   }, [slug]);
-
-  // Retreive One parcours from server
-  async function getParcours() {
-    const token = await SecureStore.getItemAsync("token");
-    const options = {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-    };
-    const response = await fetch(
-      `http://${backServerAddress}:3001/parcours/${slug}`,
-      options
-    );
-    const data = await response.json();
-    if (!data) {
-      setParcours({});
-      setErrorMessage("Aucun résultat trouvé");
-    }
-    if (data) {
-      setParcours(data);
-      setErrorMessage(null);
-    }
-  }
 
   // Display all the treks available for one parcours
   async function getTreks() {
@@ -84,36 +56,50 @@ export default function TreksSingle({ route, navigation }) {
     }
     if (data) {
       setTreks(data);
+      getParcoursAndGuide(data.parcoursID, data.guideID);
       setErrorMessage(null);
     }
   }
 
 
-// Display the Guide for the trek
-async function getGuide() {
-  const token = await SecureStore.getItemAsync("token");
-  const options = {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
-    },
-  };
-  const response = await fetch(
-    `http://${backServerAddress}:3001/guides/get/${treks?.guideID}`,
-    options
-  );
-  const data = await response.json();
-  if (!data) {
-    setGuide({});
-    setErrorMessage("Aucun résultat trouvé");
+  // Display the Guide for the trek
+  async function getParcoursAndGuide(parcoursID, guideID) {
+    const token = await SecureStore.getItemAsync("token");
+    const options = {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    };
+    const guideResponse = await fetch(
+      `http://${backServerAddress}:3001/guides/get/${guideID}`,
+      options
+    );
+    const guideData = await guideResponse.json();
+    if (!guideData) {
+      setGuide({});
+      setErrorMessage("Aucun résultat trouvé");
+    }
+    if (guideData) {
+      setGuide(guideData);
+      setErrorMessage(null);
+    }
+    const parcoursResponse = await fetch(
+      `http://${backServerAddress}:3001/parcours/get/${parcoursID}`,
+      options
+    );
+    const parcoursData = await parcoursResponse.json();
+    if (!parcoursData) {
+      setParcours({});
+      setErrorMessage("Aucun résultat trouvé");
+    }
+    if (parcoursData) {
+      setParcours(parcoursData);
+      setErrorMessage(null);
+    }
   }
-  if (data) {
-    setGuide(data);
-    setErrorMessage(null);
-  }
-}
 
   // Send Bookings to server
   async function putBooking() {

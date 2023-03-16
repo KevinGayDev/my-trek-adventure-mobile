@@ -22,55 +22,20 @@ export default function TreksUser({ route, navigation }) {
   const [parcours, setParcours] = useState({});
   const [parcoursSteps, setParcoursSteps] = useState([]);
   const [treks, setTreks] = useState({
-    beginDate: "2023-03-14T17:14:13.951Z" ,
+    beginDate: "2023-03-14T17:14:13.951Z",
     endDate: "2023-03-14T17:14:13.951Z"
   });
   const [guide, setGuide] = useState({});
-  const [treks, setTreks] = useState([]);
-  const [userPos] = useState ({latitude: "", longitude:""});
+  const [location, setLocation] = useState(null);
 
   const [errorMessage, setErrorMessage] = useState(null);
   useEffect(() => {
     getTreks();
-    getParcours();
-     // getGuide();
-     getUserPosition();
   }, [slugTrek]);
 
   // useEffect(() => {
- 
+
   // }, [parcours]);
-
-  // Retreive One parcours from server
-  async function getParcours() {
-    const token = await SecureStore.getItemAsync("token");
-    const options = {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-    };
-    const response = await fetch(
-      `http://${backServerAddress}:3001/parcours/get/${parcoursID}`,
-      options
-    );
-    const data = await response.json();
-    if (!data) {
-      setParcours({});
-      setParcoursSteps();
-      setErrorMessage("Aucun résultat trouvé");
-    }
-    if (data) {
-      setParcours(data);
-      setParcoursSteps(data.steps);
-      setErrorMessage(null);
-    }
-  }
-
-  if (parcours) {
-  console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXX3", treks);}
 
   // Display all the treks available for one parcours
   async function getTreks() {
@@ -95,12 +60,13 @@ export default function TreksUser({ route, navigation }) {
     if (data) {
       setTreks(data);
       setErrorMessage(null);
-      // getGuide();
+      getParcoursAndGuide(data.parcoursID, data.guideID);
+      getUserPosition();
     }
   }
 
   // Display the Guide for the trek
-  async function getGuide() {
+  async function getParcoursAndGuide(parcoursID, guideID) {
     const token = await SecureStore.getItemAsync("token");
     const options = {
       method: "GET",
@@ -110,34 +76,44 @@ export default function TreksUser({ route, navigation }) {
         Authorization: "Bearer " + token,
       },
     };
-    
-    
-    const response = await fetch(
-      `http://${backServerAddress}:3001/guides/get/${treks?.guideID}`,
+    const guideResponse = await fetch(
+      `http://${backServerAddress}:3001/guides/get/${guideID}`,
       options
     );
-    const data = await response.json();
-    if (!data) {
+    const guideData = await guideResponse.json();
+    if (!guideData) {
       setGuide({});
       setErrorMessage("Aucun résultat trouvé");
     }
-    if (data) {
-      setGuide(data);
+    if (guideData) {
+      setGuide(guideData);
+      setErrorMessage(null);
+    }
+    const parcoursResponse = await fetch(
+      `http://${backServerAddress}:3001/parcours/get/${parcoursID}`,
+      options
+    );
+    const parcoursData = await parcoursResponse.json();
+    if (!parcoursData) {
+      setParcours({});
+      setParcoursSteps();
+      setErrorMessage("Aucun résultat trouvé");
+    }
+    if (parcoursData) {
+      setParcours(parcoursData);
+      setParcoursSteps(parcoursData.steps);
       setErrorMessage(null);
     }
   }
-  
-  async function getUserPosition(){
+
+  async function getUserPosition() {
     let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') 
-    {
+    if (status !== 'granted') {
       setErrorMsg("L'application n'a pas pu accéder à votre position");
       return;
     }
-
     let location = await Location.getCurrentPositionAsync({});
-    userPos.latitude = location.coords.latitude;
-    userPos.longitude = location.coords.longitude;
+    setLocation(location);
   }
 
   return (
@@ -146,7 +122,7 @@ export default function TreksUser({ route, navigation }) {
         <Text style={styles.title}>{parcours.name}</Text>
         <Text>départ le : </Text><Text style={styles.stepTitle}>{format(new Date(treks?.beginDate), 'dd/MM/yyyy')}</Text>
         <Text>arrivée le : </Text><Text style={styles.stepTitle}>{format(new Date(treks?.endDate), 'dd/MM/yyyy')}</Text>
-        { guide && <View><Text>Guide : </Text><Text style={styles.stepTitle}>{guide?.firstName} {guide?.lastName}</Text></View>}
+        {guide && <View><Text>Guide : </Text><Text style={styles.stepTitle}>{guide?.firstName} {guide?.lastName}</Text></View>}
       </View>
       <View style={styles.containerMap}>
         <MapView
@@ -173,16 +149,16 @@ export default function TreksUser({ route, navigation }) {
           ))}
 
           {/* User marker */}
-          <Marker
-              // key={index}
-              coordinate={{
-                latitude: userPos.latitude,
-                longitude: userPos.longitude,
-              }}
-              title="Ma position actuelle"
-              /*description={marker.stepDescription}*/
-              pinColor="green"
-            />
+          {location && (<Marker
+            // key={index}
+            coordinate={{
+              latitude: location?.coords?.latitude,
+              longitude: location?.coords?.longitude,
+            }}
+            title="Ma position actuelle"
+            /*description={marker.stepDescription}*/
+            pinColor="green"
+          />)}
 
         </MapView>
       </View>

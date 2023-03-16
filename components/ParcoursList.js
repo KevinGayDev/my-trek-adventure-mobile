@@ -95,8 +95,8 @@ export default function ParcoursList({ navigation }) {
       </View>
 
       {/* If the user searches a parcours by name*/}
-      {displaySearch && (
-      )}
+      {/*displaySearch && (
+      )/*}
       {/* If the user uses one or more filters for a search*/}
       {/*displayFilters && (
 
