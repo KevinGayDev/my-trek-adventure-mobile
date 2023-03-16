@@ -171,6 +171,8 @@ export default function ParcoursSingle({ route, navigation }) {
             <View style={styles.stepTop}>
               <View style={styles.left}>
                 <Text style={styles.stepTitle}>{step.stepName}</Text>
+                <Text style={styles.stepCoords}>Latitude : {step.stepLatitude}°</Text>
+                <Text style={styles.stepCoords}>Longitude : {step.stepLongitude}°</Text>
               </View>
               <View style={styles.left}>
                 <Image
@@ -231,7 +233,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: "bold",
-    marginVertical: 10,
+    marginVertical: 5,
   },
   title2: {
     fontSize: 22,
@@ -245,8 +247,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     // alignSelf: "center",
-    margin: 20,
-    flex: 1
+    margin: 10,
+    //flex: 1
   },
   highlight: {
     backgroundColor: "#b0a292",
@@ -292,9 +294,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flex: 1,
   },
+  stepCoords: {
+    paddingHorizontal: 10
+  },
   stepDescription: {
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     textAlign: "justify",
   },
   priceText: {
