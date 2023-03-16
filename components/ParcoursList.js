@@ -16,13 +16,36 @@ import * as SecureStore from "expo-secure-store";
 import { Foundation } from "@expo/vector-icons";
 
 export default function ParcoursList({ navigation }) {
-  // const [isConnected, setIsConnected] = useState(false);
   const [parcoursList, setParcourslist] = useState([]);
+  const [parcoursFilterList, setParcoursFilterList] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
+
+  const [searchParcours, setSearchParcours] = useState("");
+
+  const [displaySearch, setDisplaySearch] = useState(false);
+  const [displayFilters, setDisplayFilters] = useState(false);
 
   useEffect(() => {
     displayParcoursList();
   }, []);
+
+  useEffect(() => {
+    if (searchParcours !== "") {
+      const timeoutId = setTimeout(() => {
+        setDisplaySearch(true);
+      }, 500);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }
+  }, [searchParcours]);
+
+
+  // Get change from the searchbox
+  function handleChange(label, value) {
+    setSearchParcours({ ...searchParcours, value });
+  }
 
   async function displayParcoursList() {
     const token = await SecureStore.getItemAsync("token");
@@ -47,102 +70,115 @@ export default function ParcoursList({ navigation }) {
 
     if (Array.isArray(data)) {
       setParcourslist(data);
+      setParcoursFilterList(data);
       setErrorMessage(null);
     }
   }
+
   console.log(parcoursList);
   return (
     <View style={styles.containerParcours}>
-      {parcoursList.map((parcours) => (
-        <View style={styles.viewParcour} key={parcours._id}>
-          <View style={styles.parcoursTop}>
-            <Image
-              source={{
-                uri: `http://${backServerAddress}:3001${parcours.parcoursPicture}`,
-              }}
-              style={styles.image}
-            />
+      <View>
+        <TextInput
+          style={styles.input}
+          onChangeText={handleChange}
+          value={searchParcours}
+          placeholder="Entrer un nom (par ex.): Parcours"
+          keyboardType="default"
+        />
+        <Text style={[styles.highlight]}>Rechercher par nom</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setDisplayFilters(true)}
+        ><Text style={styles.textbutton}>+ de filtres</Text>
+        </TouchableOpacity>
+      </View>
 
-            <View style={styles.left}>
-              <Text style={styles.titleParcour}>{parcours.name}</Text>
-              <Text style={styles.titleCountry}>{parcours.country}</Text>
+      {/* If the user searches a parcours by name*/}
+      {displaySearch && (
+      )}
+      {/* If the user uses one or more filters for a search*/}
+      {/*displayFilters && (
 
-              {parcours.duration === 1 ? (
-                <Text style={styles.highlight}>{parcours.duration} jour</Text>
-              ) : (
-                <Text style={[styles.highlight]}>
-                  {parcours.duration} jours
-                </Text>
-              )}
+      )*/}
 
-              {parcours.difficulty === 1 && (
-                <Text style={styles.highlight}>
-                  Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />
-                </Text>
-              )}
+      {/* Normal display */}
+      {!displaySearch && !displayFilters && (
+        <>
+          {parcoursList.map((parcours) => (
+            <View style={styles.viewParcour} key={parcours._id}>
+              <View style={styles.parcoursTop}>
+                <Image source={{
+                  uri: `http://${backServerAddress}:3001${parcours.parcoursPicture}`,
+                }}
+                  style={styles.image}
+                />
 
-              {parcours.difficulty === 2 && (
-                <Text style={styles.highlight}>
-                  Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
-                  <Foundation name="foot" size={16} color={"#f1ebe3"} />
-                </Text>
-              )}
-              {parcours.difficulty === 3 && (
-                <Text style={styles.highlight}>
-                  Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
-                  <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
-                  <Foundation name="foot" size={16} color={"#f1ebe3"} />
-                </Text>
-              )}
-            </View>
-          </View>
+                <View style={styles.left}>
+                  <Text style={styles.titleParcour}>{parcours.name}</Text>
+                  <Text style={styles.titleCountry}>{parcours.country}</Text>
 
-          <View style={styles.parcoursMiddle}>
-            <Text numberOfLines={3} style={styles.textDescription}>
-              {parcours.description}
-            </Text>
-            <View style={styles.parcoursBottom}>
-              <View style={styles.leftBottom}>
-                <Text style={styles.priceText}>{parcours.price} €</Text>
+                  {parcours.duration === 1 ? (
+                    <Text style={styles.highlight}>{parcours.duration} jour</Text>
+                  ) : (
+                    <Text style={[styles.highlight]}>
+                      {parcours.duration} jours
+                    </Text>
+                  )}
+
+                  {parcours.difficulty === 1 && (
+                    <Text style={styles.highlight}>
+                      Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />
+                    </Text>
+                  )}
+
+                  {parcours.difficulty === 2 && (
+                    <Text style={styles.highlight}>
+                      Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+                      <Foundation name="foot" size={16} color={"#f1ebe3"} />
+                    </Text>
+                  )}
+                  {parcours.difficulty === 3 && (
+                    <Text style={styles.highlight}>
+                      Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+                      <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+                      <Foundation name="foot" size={16} color={"#f1ebe3"} />
+                    </Text>
+                  )}
+                </View>
               </View>
-              <View style={styles.right}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() =>
-                    // navigation.navigate("ParcoursSingle", { slug : parcours.slug
-                    navigation.navigate("ParcoursSingle", {
-                      slug: parcours.slug,
-                      iD: parcours._id,
-                      name: parcours.name,
-                      // userID: METTRE ICI La donnée à renvoyer dans la page parcours Single.
-                    })
-                  }
-                >
-                  <Text style={styles.textbutton}>Détail</Text>
-                </TouchableOpacity>
+
+              <View style={styles.parcoursMiddle}>
+                <Text numberOfLines={3} style={styles.textDescription}>
+                  {parcours.description}
+                </Text>
+                <View style={styles.parcoursBottom}>
+                  <View style={styles.leftBottom}>
+                    <Text style={styles.priceText}>{parcours.price} €</Text>
+                  </View>
+                  <View style={styles.right}>
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() =>
+                        // navigation.navigate("ParcoursSingle", { slug : parcours.slug
+                        navigation.navigate("ParcoursSingle", {
+                          slug: parcours.slug,
+                          iD: parcours._id,
+                          name: parcours.name,
+                          // userID: METTRE ICI La donnée à renvoyer dans la page parcours Single.
+                        })
+                      }
+                    >
+                      <Text style={styles.textbutton}>Détail</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
             </View>
-          </View>
-        </View>
-      ))}
+          ))}
+        </>
+      )}
     </View>
-
-    // code REACT KEBIN
-    // <div id = "parcoursList">
-    //   <p>Liste des parcours</p>
-    //     {parcoursList.map((parcours, index) => (
-    //       <Parcours
-    //         key = {index}
-    //         picture = {parcours.picture}
-    //         name = {parcours.name}
-    //         duration = {parcours.duration}
-    //         description = {parcours.description}
-    //         price = {parcours.price}
-    //         difficulty = {parcours.difficulty}
-    //         slug = {parcours.slug}
-    //         />
-    //     ))}
-    // </div>
   );
 }
 const styles = StyleSheet.create({
@@ -175,10 +211,10 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     flexShrink: 1,
   },
-titleCountry: {
-  marginBottom: 8,
-  fontSize: 16,
-},
+  titleCountry: {
+    marginBottom: 8,
+    fontSize: 16,
+  },
 
   left: {
     paddingHorizontal: 16,

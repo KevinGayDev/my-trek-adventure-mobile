@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
+import * as Location from 'expo-location';
 import { UserConnect } from "../App";
 import MapView from "react-native-maps";
 import { Marker } from "react-native-maps";
@@ -25,13 +26,15 @@ export default function TreksUser({ route, navigation }) {
     endDate: "2023-03-14T17:14:13.951Z"
   });
   const [guide, setGuide] = useState({});
-
+  const [treks, setTreks] = useState([]);
+  const [userPos] = useState ({latitude: "", longitude:""});
 
   const [errorMessage, setErrorMessage] = useState(null);
   useEffect(() => {
     getTreks();
     getParcours();
-     //   getGuide();
+     // getGuide();
+     getUserPosition();
   }, [slugTrek]);
 
   // useEffect(() => {
@@ -123,8 +126,19 @@ export default function TreksUser({ route, navigation }) {
       setErrorMessage(null);
     }
   }
+  
+  async function getUserPosition(){
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') 
+    {
+      setErrorMsg("L'application n'a pas pu accéder à votre position");
+      return;
+    }
 
-
+    let location = await Location.getCurrentPositionAsync({});
+    userPos.latitude = location.coords.latitude;
+    userPos.longitude = location.coords.longitude;
+  }
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -145,8 +159,6 @@ export default function TreksUser({ route, navigation }) {
           }}
         >
           {/* Custom OSM Tile */}
-
-
           {parcoursSteps.map((marker) => (
             <Marker
               key={marker.stepLatitude}
@@ -160,7 +172,17 @@ export default function TreksUser({ route, navigation }) {
             />
           ))}
 
-
+          {/* User marker */}
+          <Marker
+              // key={index}
+              coordinate={{
+                latitude: userPos.latitude,
+                longitude: userPos.longitude,
+              }}
+              title="Ma position actuelle"
+              /*description={marker.stepDescription}*/
+              pinColor="green"
+            />
 
         </MapView>
       </View>
