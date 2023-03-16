@@ -12,7 +12,8 @@ import ImagePickerComponent from "../components/ImagePickerComponent";
 import { useEffect, useState, useContext } from "react";
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
-import { UserConnect } from "../App";
+// import { UserConnect } from "../App";
+import UserConnect  from "../Context";
 
 export default function Profil({ navigation }) {
   // Image for ImagePickerComponent passed as prop
@@ -145,7 +146,9 @@ export default function Profil({ navigation }) {
   return (
     <ScrollView contentContainerStyle={styles.containerScroll}>
       {/* <ImageBackground source={require("../assets/nik-shuliahin-rkFIIE9PxH0-unsplash.jpg")}  style={{flex:1, }}> */}
-
+      <TouchableOpacity style={styles.button} onPress={() => disconnect()}>
+          <Text style={styles.textbutton}>Me déconnecter</Text>
+        </TouchableOpacity>
       <View style={styles.container}>
         {userDetail?.clientPicture !== "" && (
           <Image
@@ -154,14 +157,11 @@ export default function Profil({ navigation }) {
           />
         )}
 
-        <Text style={styles.content}>{userDetail?.firstName}</Text>
-        <Text style={styles.content}>{userDetail?.lastName}</Text>
-        <Text style={styles.content}>{userDetail?.mail}</Text>
-        <Text style={styles.content}>{userDetail?.pro}</Text>
+        <Text style={styles.content}>Nom : {userDetail?.firstName}</Text>
+        <Text style={styles.content}>Prénom : {userDetail?.lastName}</Text>
+        <Text style={styles.content}>Email : {userDetail?.mail}</Text>
 
-        <TouchableOpacity style={styles.button} onPress={() => disconnect()}>
-          <Text style={styles.textbutton}>Me déconnecter</Text>
-        </TouchableOpacity>
+
 
         <TouchableOpacity
           style={styles.button}
@@ -235,13 +235,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-    backgroundColor: "#f1ebe3",
+    backgroundColor: "white",
     margin: 20,
     borderRadius: 16,
   },
   containerScroll: {
     flexGrow: 1,
-    backgroundColor: "#f3f2ef",
+    backgroundColor: "#f1ebe3",
   },
 
   profilePicture: {
@@ -253,11 +253,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     backgroundColor: "#fff",
-    width: 250,
+    width: 300,
     height: 50,
     marginBottom: 20,
     padding: 10,
     fontSize: 16,
+    alignSelf: "center"
+
   },
   button: {
     backgroundColor: "#a92e34",
@@ -268,7 +270,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     margin: 36,
   },
-
   text: {
     textAlign: "left",
     alignSelf: "flex-start",
@@ -279,4 +280,11 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontSize: 16,
   },
+  content : {
+    fontSize: 18,
+    alignSelf: "flex-start",
+    paddingHorizontal: 18,
+    paddingVertical: 2,
+
+  }
 });

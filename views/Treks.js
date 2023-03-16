@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import { UserConnect } from "../App";
+// import { UserConnect } from "../App";
+import UserConnect  from "../Context";
 import { useContext, useState, useEffect } from "react";
 import * as Location from 'expo-location';
 import * as SecureStore from "expo-secure-store";
@@ -40,8 +41,10 @@ export default function Treks({ navigation }) {
     let data = await result.json();
     if (data !== null) {
       setBookings(data);
-      console.log(bookings);
+      // console.log(bookings);
       getUserPosition();
+      // console.log(location);
+
     }
 
     async function getUserPosition() {
@@ -51,6 +54,8 @@ export default function Treks({ navigation }) {
         return;
       }
       let location = await Location.getCurrentPositionAsync({});
+      console.log(" -------- location ----------")
+      console.log(location)
       setLocation(location);
     }
   }
@@ -160,16 +165,17 @@ const styles = StyleSheet.create({
     marginVertical: 50,
     borderRadius: 10,
     borderColor: "black",
-    borderWidth: 1,
     paddingVertical: 10,
     paddingHorizontal: 18,
     backgroundColor: "white",
+  
   },
   trekItem: {
     flexDirection: "row",
     justifyContent: "center",
     alignContent: "center",
     margin: 10,
+    justifyContent: 'flex-end'
   },
   button: {
     paddingVertical: 2,

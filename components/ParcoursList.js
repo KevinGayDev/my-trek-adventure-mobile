@@ -4,9 +4,6 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  TouchableWithoutFeedback,
-  Keyboard,
   Image,
 } from "react-native";
 import * as React from "react";
@@ -238,9 +235,8 @@ const styles = StyleSheet.create({
   },
   textbutton: {
     alignSelf: "center",
-    fontSize: 12,
+    fontSize: 14,
   },
-
   image: {
     width: 180,
     height: 180,
@@ -259,4 +255,10 @@ const styles = StyleSheet.create({
   priceText: {
     fontWeight: "bold",
   },
+
+  input: {
+    borderRadius : 8,
+    borderWidth: 1,
+    height: 40,
+  }
 });

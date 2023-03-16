@@ -9,7 +9,8 @@ import {
 } from "react-native";
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
-import { UserConnect } from "../App";
+// import { UserConnect } from "../App";
+import UserConnect  from "../Context";
 import { format } from "date-fns";
 
 export default function TreksSingle({ route, navigation }) {

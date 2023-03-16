@@ -1,4 +1,4 @@
-import { StyleSheet  } from "react-native";
+import { StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Foundation } from "@expo/vector-icons";
 import Treks from "./Treks";
@@ -7,6 +7,8 @@ import Profil from "./Profil";
 import ParcoursSingle from "./ParcoursSingle";
 import TreksSingle from "./TreksSingle";
 import TreksUser from "./TreksUser";
+// import { UserConnect } from "../App";
+import UserConnect from "../Context";
 
 // import { UserConnect } from "../App";
 // import { useContext } from "react";
@@ -27,7 +29,10 @@ export default function Navbar({ navigation }) {
         tabBarInactiveTintColor: "grey",
         tabBarActiveTintColor: "black",
         tabBarHideOnKeyboard: true,
-        tabBarStyle: { backgroundColor: "#fda82e" },
+        tabBarStyle: { backgroundColor: "#fda82e", height: 56 },
+        tabBarLabelStyle: {
+          fontSize: 14,
+      }
       }}
 
       //  screenOptions={{ headerShown: false }}
@@ -38,7 +43,7 @@ export default function Navbar({ navigation }) {
         options={{
           // tabBarLabel: "Home",
           tabBarIcon: ({ color, size, focused, activecolor }) => (
-            <Foundation name="foot" size={size} color={color} />
+            <Foundation name="foot" size={32} color={color} />
           ),
           headerStyle: {
             backgroundColor: "#fda82e",
@@ -52,7 +57,7 @@ export default function Navbar({ navigation }) {
         options={{
           // tabBarLabel: "Home",
           tabBarIcon: ({ color, size, focused, activecolor }) => (
-            <Foundation name="calendar" size={size} color={color} />
+            <Foundation name="calendar" size={32} color={color} />
           ),
           headerStyle: {
             backgroundColor: "#fda82e",
@@ -65,7 +70,7 @@ export default function Navbar({ navigation }) {
         component={Profil}
         options={{
           tabBarIcon: ({ color, size, focused, activecolor }) => (
-            <Foundation name="info" size={size} color={color} />
+            <Foundation name="info" size={32} color={color} />
           ),
           headerStyle: {
             backgroundColor: "#fda82e",
