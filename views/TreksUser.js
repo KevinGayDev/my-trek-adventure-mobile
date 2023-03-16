@@ -1,22 +1,13 @@
 import { useState, useEffect, useContext } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
-import { UserConnect } from "../App";
-import MapView, {
-  MAP_TYPES,
-  PROVIDER_DEFAULT,
-  UrlTile,
-} from "react-native-maps";
+import * as Location from "expo-location";
+// import { UserConnect } from "../App";
+import UserConnect from "../Context";
+import MapView from "react-native-maps";
 import { Marker } from "react-native-maps";
-import { Polyline } from "react-native-maps";
+import { format } from "date-fns";
 
 export default function TreksUser({ route, navigation }) {
   const { trekID, slug, slugTrek, parcoursID } = route.params;
@@ -25,43 +16,21 @@ export default function TreksUser({ route, navigation }) {
   // retreive parcours details from server
   const [parcours, setParcours] = useState({});
   const [parcoursSteps, setParcoursSteps] = useState([]);
-  const [treks, setTreks] = useState([]);
+  const [treks, setTreks] = useState({
+    beginDate: "2023-03-14T17:14:13.951Z",
+    endDate: "2023-03-14T17:14:13.951Z",
+  });
+  const [guide, setGuide] = useState({});
+  const [location, setLocation] = useState(null);
 
   const [errorMessage, setErrorMessage] = useState(null);
   useEffect(() => {
-    getParcours();
     getTreks();
   }, [slugTrek]);
 
-  // Retreive One parcours from server
-  async function getParcours() {
-    const token = await SecureStore.getItemAsync("token");
-    const options = {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-    };
-    const response = await fetch(
-      `http://${backServerAddress}:3001/parcours/get/${parcoursID}`,
-      options
-    );
-    const data = await response.json();
-    if (!data) {
-      setParcours({});
-      setParcoursSteps();
-      setErrorMessage("Aucun résultat trouvé");
-    }
-    if (data) {
-      setParcours(data);
-      setParcoursSteps(data.steps);
-      setErrorMessage(null);
-      // displayTreks()
-    }
-  }
-  console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXX3", parcoursSteps[0]);
+  // useEffect(() => {
+
+  // }, [parcours]);
 
   // Display all the treks available for one parcours
   async function getTreks() {
@@ -86,63 +55,106 @@ export default function TreksUser({ route, navigation }) {
     if (data) {
       setTreks(data);
       setErrorMessage(null);
+      getParcoursAndGuide(data.parcoursID, data.guideID);
+      getUserPosition();
     }
   }
 
-  // Send Bookings to server
-  async function putBooking() {
+  // Display the Guide for the trek
+  async function getParcoursAndGuide(parcoursID, guideID) {
     const token = await SecureStore.getItemAsync("token");
     const options = {
-      method: "PUT",
+      method: "GET",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
-      body: JSON.stringify({ trekID: trekID }),
     };
-
-    const response = await fetch(
-      `http://${backServerAddress}:3001/bookings/add`,
+    const guideResponse = await fetch(
+      `http://${backServerAddress}:3001/guides/get/${guideID}`,
       options
     );
-    const data = await response.json();
-    if (!data) {
-      setParcours({});
+    const guideData = await guideResponse.json();
+    if (!guideData) {
+      setGuide({});
       setErrorMessage("Aucun résultat trouvé");
     }
-    if (data) {
-      setParcours(data);
-
+    if (guideData) {
+      setGuide(guideData);
+      setErrorMessage(null);
+    }
+    const parcoursResponse = await fetch(
+      `http://${backServerAddress}:3001/parcours/get/${parcoursID}`,
+      options
+    );
+    const parcoursData = await parcoursResponse.json();
+    if (!parcoursData) {
+      setParcours({});
+      setParcoursSteps();
+      setErrorMessage("Aucun résultat trouvé");
+    }
+    if (parcoursData) {
+      setParcours(parcoursData);
+      setParcoursSteps(parcoursData.steps);
       setErrorMessage(null);
     }
   }
+
+  async function getUserPosition() {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      setErrorMsg("L'application n'a pas pu accéder à votre position");
+      return;
+    }
+    let location = await Location.getCurrentPositionAsync({});
+    setLocation(location);
+  }
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
         <Text style={styles.title}>{parcours.name}</Text>
-        <Text style={styles.stepDescription}>{treks?.trekName}</Text>
+        <Text>départ le : </Text>
+        <Text style={styles.stepTitle}>
+          {format(new Date(treks?.beginDate), "dd/MM/yyyy")}
+        </Text>
+        <Text>arrivée le : </Text>
+        <Text style={styles.stepTitle}>
+          {format(new Date(treks?.endDate), "dd/MM/yyyy")}
+        </Text>
+        {guide && (
+          <View>
+            <Text>Guide : </Text>
+            <Text style={styles.stepTitle}>
+              {guide?.firstName} {guide?.lastName}
+            </Text>
+          </View>
+        )}
 
-        <Text style={styles.stepTitle}>{treks?.beginDate}</Text>
-        <Text style={styles.stepTitle}>{treks?.endDate}</Text>
-        <Text style={styles.stepTitle}>Guide : </Text>
+        <View style={styles.progressionContainer}>
+
+          <Text style={[styles.stepTitle, {marginBottom: 10}]}> Votre progression</Text>
+          {parcoursSteps.map((step) => (
+            <Text> {step.stepName}</Text>
+          ))}
+        </View>
       </View>
+
       <View style={styles.containerMap}>
         <MapView
           style={styles.map}
           region={{
             latitude: parcoursSteps[0]?.stepLatitude,
             longitude: parcoursSteps[0]?.stepLongitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitudeDelta: 0.8,
+            longitudeDelta: 0.8,
           }}
         >
           {/* Custom OSM Tile */}
-
-
           {parcoursSteps.map((marker) => (
             <Marker
-              // key={index}
+              key={marker.stepLatitude}
               coordinate={{
                 latitude: marker.stepLatitude,
                 longitude: marker.stepLongitude,
@@ -153,77 +165,22 @@ export default function TreksUser({ route, navigation }) {
             />
           ))}
 
-{/* {parcoursSteps.map((marker) => (
-  <Polyline
-        coordinates={{latitude: marker.stepLatitude,
-          longitude: marker.stepLongitude,}} //specify our coordinates
-        strokeColor={"#000"}
-        strokeWidth={3}
-        lineDashPattern={[1]}
-      />
-          ))} */}
-
-
+          {/* User marker */}
+          {location && (
+            <Marker
+              // key={index}
+              coordinate={{
+                latitude: location?.coords?.latitude,
+                longitude: location?.coords?.longitude,
+              }}
+              title="Ma position actuelle"
+              /*description={marker.stepDescription}*/
+              pinColor="green"
+            />
+          )}
         </MapView>
       </View>
-      {/* <View style={styles.container}>
-        <Image
-          source={{
-            uri: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Oldoinyolengai.jpg",
-          }}
-          style={styles.image}
-        />
-        {parcours.duration === 1 ? (
-          <Text>Durée : {parcours.duration} jour</Text>
-        ) : (
-          <Text>Durée : {parcours.duration} jours</Text>
-        )}
-        <Text>Prix :{parcours.price} €</Text>
-        <Text>Difficulté: {parcours.difficulty}</Text>
-        <Text>Détail du parcours</Text>
-        <Text>{parcours.description}</Text>
-        <Text>Les étapes : </Text>
-        {parcours?.steps?.map((step) => (
-          <View key={step._id} style={styles.step}>
-            <View style={styles.left}>
-              <Image
-                source={{
-                  uri: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Oldoinyolengai.jpg",
-                }}
-                style={styles.stepImage}
-              />
-            </View>
-            <View style={styles.right}>
-              <Text style={styles.stepDescription}>{step.stepDescription}</Text>
-            </View>
-          </View>
-        ))}
-        {treks?.map((trek) => (
-          <View key={trek?._id} style={styles.step}>
-            <View style={styles.left}>
-              <Image
-              />
-            </View>
-            <View style={styles.right}>
-              <Text style={styles.stepTitle}>{trek?.beginDate}</Text>
-              <Text style={styles.stepDescription}>{trek?.trekName}</Text>
-              <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              // navigation.navigate("ParcoursSingle", { slug : parcours.slug
-              navigation.navigate("TrekSingle", {
-                iD: trek._id,
-                name: trek.trekName,
-                slug: trek._id,
-                // userID: METTRE ICI La donnée à renvoyer dans la page parcours Single.
-              })
-            }
-          ><Text style={styles.textbutton}>Réserver</Text>
-          </TouchableOpacity>
-            </View>
-          </View>
-        ))}
-      </View> */}
+      
     </ScrollView>
   );
 }
@@ -231,9 +188,16 @@ export default function TreksUser({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
+    backgroundColor: "#f1ebe3",   
+     alignItems: "center",
     justifyContent: "flex-start",
+  },
+  progressionContainer: {
+    borderWidth: 1,
+    padding: 16,
+    borderRadius: 8,
+    margin: 12,
+    backgroundColor: "white"
   },
   stepContainer: {
     backgroundColor: "pink",

@@ -18,15 +18,8 @@ import ImagePickerComponent from "../components/ImagePickerComponent";
 
 export default function Register({ navigation }) {
   const [image, setImage] = useState(null);
-
-  React.useEffect(() => {
-    setUser({ ...user, ["profilePicture"]: image });
-  }, [image]);
-
-  React.useEffect(() => {
-    console.log(user);
-  }, [user]);
-
+  const [errorMessage, setErrorMessage] = React.useState(null);
+  const [successMessage, setsuccessMessage] = React.useState(null);
   const [user, setUser] = useState({
     firstName: "",
     lastName: "",
@@ -35,12 +28,20 @@ export default function Register({ navigation }) {
     clientPicture: "",
   });
 
-  const [errorMessage, setErrorMessage] = React.useState(null);
-  const [successMessage, setsuccessMessage] = React.useState(null);
+  React.useEffect(() => {
+    setUser({ ...user, ["clientPicture"]: image });
+  }, [image]);
 
+  React.useEffect(() => {
+    console.log(user);
+  }, [user]);
+
+  // Get change from Inputs.
   function handleChange(label, value) {
     setUser({ ...user, [label]: value });
   }
+
+  // Get change from Inputs.
 
   async function handleSubmit() {
     if (
@@ -64,11 +65,12 @@ export default function Register({ navigation }) {
       formdata.append("lastName", user.lastName);
       formdata.append("mail", user.mail);
       formdata.append("password", user.password);
-      formdata.append("clientPicture", {
-        name: "profile.jpeg",
-        uri: image,
-        type: "image/jpeg",
-      });
+      //   if (image) { formdata.append("clientPicture", {
+      //     name: "profile.jpeg",
+      //     uri: image,
+      //     type: "image/jpeg",
+      //   });
+      // }
 
       let options = {
         method: "POST",
@@ -104,6 +106,7 @@ export default function Register({ navigation }) {
       }
     }
   }
+  
 
   return (
     <KeyboardAvoidingView
@@ -179,7 +182,7 @@ export default function Register({ navigation }) {
               style={styles.button}
               onPress={() => navigation.navigate("Login")}
             >
-              <Text>Vers la page de connexion </Text>
+              <Text style={styles.textbutton}>Vers la page de connexion </Text>
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>

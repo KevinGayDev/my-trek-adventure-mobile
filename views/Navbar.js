@@ -1,44 +1,53 @@
-import { StyleSheet, ScrollView} from "react-native";
+import { StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { SimpleLineIcons } from "@expo/vector-icons";
-import { Foundation } from '@expo/vector-icons'; 
+import { Foundation } from "@expo/vector-icons";
 import Treks from "./Treks";
 import Parcours from "./Parcours";
 import Profil from "./Profil";
 import ParcoursSingle from "./ParcoursSingle";
 import TreksSingle from "./TreksSingle";
 import TreksUser from "./TreksUser";
+// import { UserConnect } from "../App";
+import UserConnect from "../Context";
 
 // import { UserConnect } from "../App";
 // import { useContext } from "react";
 
 // import ParcoursStackNav from "./ParcoursStackNav";
 
-export default function Navbar({navigation}) {
-  
+export default function Navbar({ navigation }) {
   const Tab = createBottomTabNavigator();
   // const {userLog, disconnect} = useContext(UserConnect);
 
   // if (!userLog) {
   //   disconnect();
   //   navigation.navigate("Login");}
-  
 
   return (
-    <Tab.Navigator 
-    screenOptions={{tabBarHideOnKeyboard: true }}
-   
-    //  screenOptions={{ headerShown: false }} 
-     >
+    <Tab.Navigator
+      screenOptions={{
+        tabBarInactiveTintColor: "grey",
+        tabBarActiveTintColor: "black",
+        tabBarHideOnKeyboard: true,
+        tabBarStyle: { backgroundColor: "#fda82e", height: 56 },
+        tabBarLabelStyle: {
+          fontSize: 14,
+      }
+      }}
 
+      //  screenOptions={{ headerShown: false }}
+    >
       <Tab.Screen
         name="Mes treks"
         component={Treks}
         options={{
           // tabBarLabel: "Home",
-          tabBarIcon: ({ color, size, focused, activecolor  }) => (
-            <Foundation name="foot" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused, activecolor }) => (
+            <Foundation name="foot" size={32} color={color} />
           ),
+          headerStyle: {
+            backgroundColor: "#fda82e",
+          },
         }}
       />
 
@@ -47,62 +56,67 @@ export default function Navbar({navigation}) {
         component={Parcours}
         options={{
           // tabBarLabel: "Home",
-          tabBarIcon: ({ color, size, focused, activecolor  }) => (
-            <Foundation name="calendar" size={size} color={color}  />
+          tabBarIcon: ({ color, size, focused, activecolor }) => (
+            <Foundation name="calendar" size={32} color={color} />
           ),
+          headerStyle: {
+            backgroundColor: "#fda82e",
+          },
         }}
       />
 
-<Tab.Screen
+      <Tab.Screen
         name="Mon profil"
         component={Profil}
-        options={{ 
-          tabBarIcon: ({ color, size, focused, activecolor  }) => (
-            <Foundation name="info" size={size} color={color}  />
+        options={{
+          tabBarIcon: ({ color, size, focused, activecolor }) => (
+            <Foundation name="info" size={32} color={color} />
           ),
+          headerStyle: {
+            backgroundColor: "#fda82e",
+          },
         }}
       />
 
-<Tab.Screen
+      <Tab.Screen
         name="ParcoursSingle"
         component={ParcoursSingle}
         options={{
-          
-          title: 'Détails du parcours',
-        tabBarLabel: "Home",
-
+          title: "Détails du parcours",
+          tabBarLabel: "Home",
+          headerStyle: {
+            backgroundColor: "#fda82e",
+          },
           tabBarButton: () => null,
         }}
       />
 
-<Tab.Screen
+      <Tab.Screen
         name="TreksSingle"
         component={TreksSingle}
         options={{
-          
-          title: 'Détails du trek',
-        tabBarLabel: "Home",
-
+          title: "Détails du trek",
+          tabBarLabel: "Home",
+          headerStyle: {
+            backgroundColor: "#fda82e",
+          },
           tabBarButton: () => null,
         }}
-      />   
+      />
 
-<Tab.Screen
+      <Tab.Screen
         name="TreksUser"
         component={TreksUser}
         options={{
-          
-          title: 'Détails du trek',
-        tabBarLabel: "Home",
-
+          title: "Détails du trek",
+          tabBarLabel: "Home",
+          headerStyle: {
+            backgroundColor: "#fda82e",
+          },
           tabBarButton: () => null,
         }}
-      />   
-
+      />
     </Tab.Navigator>
-
-    
-
   );
 }
 
@@ -139,4 +153,3 @@ const styles = StyleSheet.create({
 });
 
 // import { SimpleLineIcons } from '@expo/vector-icons';
-

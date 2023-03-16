@@ -7,12 +7,14 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
+  Image
 } from "react-native";
 import * as React from "react";
 import { useState, useContext } from "react";
 import * as SecureStore from "expo-secure-store";
 import backServerAddress from "../config";
-import { UserConnect } from "../App";
+// import { UserConnect } from "../App";
+import UserConnect  from "../Context";
 
 export default function Login({ navigation }) {
   const { setUserLog } = useContext(UserConnect);
@@ -83,7 +85,14 @@ export default function Login({ navigation }) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
+
+
+        
+          <View style={styles.container}>
+          <Image
+          source={require("../assets/logo.png")}
+          style={styles.image}
+        />
           <Text>Identifiant</Text>
           <TextInput
             style={styles.input}
@@ -122,7 +131,7 @@ export default function Login({ navigation }) {
             style={styles.button}
             onPress={() => navigation.navigate("Register")}
           >
-            <Text style={styles.textbutton}>Pas encore inscrit</Text>
+            <Text style={styles.textbutton}>S'enregistrer</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
@@ -147,7 +156,7 @@ const styles = StyleSheet.create({
   // },
   container: {
     flex: 1,
-    backgroundColor: "#00a5a7",
+    backgroundColor: '#f1ebe3',
     alignItems: "center",
     justifyContent: "center",
   },
@@ -173,4 +182,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontSize: 16,
   },
+  image: {
+    width: 250,
+    resizeMode: 'contain',
+  }
 });

@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import { UserConnect } from "../App";
+// import { UserConnect } from "../App";
+import UserConnect  from "../Context";
 import { useContext, useState, useEffect } from "react";
+import * as Location from 'expo-location';
 import * as SecureStore from "expo-secure-store";
 import backServerAddress from "../config";
 import MapView, {
@@ -8,8 +10,9 @@ import MapView, {
   PROVIDER_DEFAULT,
   UrlTile,
 } from "react-native-maps";
+import { Marker } from "react-native-maps";
 
-export default function Treks({navigation}) {
+export default function Treks({ navigation }) {
   const { userLog } = useContext(UserConnect);
   // Load the first time
   useEffect(() => {
@@ -19,6 +22,7 @@ export default function Treks({navigation}) {
   const [bookings, setBookings] = useState([]);
   const [parcours, setParcours] = useState({});
   const [errorMessage, setErrorMessage] = useState(null);
+  const [location, setLocation] = useState(null);
 
   // get the "user" info from DB
   async function getMyBookings() {
@@ -37,78 +41,97 @@ export default function Treks({navigation}) {
     let data = await result.json();
     if (data !== null) {
       setBookings(data);
-      console.log(bookings);
+      // console.log(bookings);
+      getUserPosition();
+      // console.log(location);
 
-      // getParcours();
+    }
+
+    async function getUserPosition() {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg("L'application n'a pas pu accéder à votre position");
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      console.log(" -------- location ----------")
+      console.log(location)
+      setLocation(location);
     }
   }
-
-  // get the "Parcours" info from DB
-
-  // async function getParcours() {
-  //   const token = await SecureStore.getItemAsync("token");
-  //   const options = {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Authorization: "bearer " + token,
-  //     },
-  //   };
-  //   const result = await fetch(
-  //     `http://${backServerAddress}:3001/parcours/get/${bookings[0]?.parcoursID}`,
-  //     options
-  //   );
-  //   const data = await result.json();
-  //   console.log("data : -->", data);
-  //   if (data !== null) {
-  //     setParcours(data);
-  //     setErrorMessage(null);
-  //   }
-  // }
-
 
   return (
     <View style={styles.container}>
       <View style={styles.myTrekContainer}>
-        <Text style={styles.content}>Mes réservations</Text>
-        <View>
-          {bookings?.map((booking) => (
-            <View key={booking?._id} style={styles.trekItem}>
-             <TouchableOpacity onPress={() =>  navigation.navigate("TreksUser", {
-                slugTrek: booking.slug,
-                parcoursID: booking.parcoursID,
-                guideID: booking.guideID
-              }) }><Text>{booking.trekName}</Text></TouchableOpacity> 
-              {/* <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              // navigation.navigate("ParcoursSingle", { slug : parcours.slug
-              navigation.navigate("TreksSingle", {
-                trekID:  booking._id,
-                slug: slug,
-                slugTrek: booking.slug
+        <Text style={styles.title}> {bookings?.length !== 0 ? "Mes réservations" : "Ma réservation" } {bookings?.length > 1 && <Text style={{fontSize:16}}>{`(${bookings?.length})`}</Text>}</Text>
+        {bookings.length !== 0 ? (
+          <View>
+            {bookings?.map((booking) => (
+              <View key={booking?._id} style={styles.trekItem}>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("TreksUser", {
+                      slugTrek: booking.slug,
+                      parcoursID: booking.parcoursID,
+                      guideID: booking.guideID,
+                    })
+                  }
+                >
+                  <Text style={styles.text}>{booking.trekName}</Text>
+                </TouchableOpacity>
+                <Text style={styles.text}> {booking.trekState} </Text>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() =>
+                    navigation.navigate("TreksUser", {
+                      slugTrek: booking.slug,
+                      parcoursID: booking.parcoursID,
+                      guideID: booking.guideID,
+                    })
+                  }
+                >
+                  <Text style={styles.textbutton}>Détail</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <View>
+            <Text style={styles.text}>Vous n'avez pas encore reservé de trek</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() =>
+                navigation.navigate("Parcours", {
                 })
-            }
-          > <Text>{booking.trekName}</Text>
-          </TouchableOpacity> */}
-              <Text>   {booking.trekState}</Text>
-            </View>
-          ))}
-        </View>
+              }
+            >
+              <Text style={styles.textbutton}>Découvrez nos offres</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
-
-      <Text style={styles.title}>Infos</Text>
 
       <View style={styles.containerMap}>
         <MapView
           style={styles.map}
           region={{
-            // latitude: parcours?.steps[0].stepLatitude,
-            // longitude: parcours?.steps[0].stepLongitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-        />
+            latitude: location?.coords?.latitude,
+              longitude: location?.coords?.longitude,
+            latitudeDelta: 50,
+            longitudeDelta: 45,
+          }}>
+            {/* User marker */}
+          {location && (<Marker
+            // key={index}
+            coordinate={{
+              latitude: location?.coords?.latitude,
+              longitude: location?.coords?.longitude,
+            }}
+            title="Ma position actuelle"
+            /*description={marker.stepDescription}*/
+            pinColor="green"
+          />)}
+        </MapView>
       </View>
     </View>
   );
@@ -117,12 +140,18 @@ export default function Treks({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f1ebe3",
     alignItems: "center",
     justifyContent: "center",
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  title: {
+    color: "#b0a292",
+    fontWeight: "bold",
+    fontSize: 20,
+    margin: 4,
   },
   containerMap: {
     flex: 0.5,
@@ -133,14 +162,37 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   myTrekContainer: {
-    marginVertical: 10,
+    marginVertical: 50,
     borderRadius: 10,
     borderColor: "black",
-    borderWidth: 1,
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
     backgroundColor: "white",
+  
   },
   trekItem: {
     flexDirection: "row",
+    justifyContent: "center",
+    alignContent: "center",
+    margin: 10,
+    justifyContent: 'flex-end'
+  },
+  button: {
+    paddingVertical: 2,
+    paddingHorizontal: 2,
+    alignContent: "center",
+    justifyContent: "center",
+    borderRadius: 16,
+    backgroundColor: "#f89d0e",
+    width: 70,
+    marginHorizontal: 5,
+  },
+  textbutton: {
+    alignSelf: "center",
+    fontSize: 12,
+  },
+  text: {
+    fontSize: 14,
+    fontWeight: "bold",
   },
 });

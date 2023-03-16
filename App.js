@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { SafeAreaView, StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "./views/Login";
@@ -7,10 +7,11 @@ import Navbar from "./views/Navbar";
 import * as React from "react";
 import * as SecureStore from "expo-secure-store";
 import backServerAddress from "./config";
+import UserConnect from "./Context"
 
 import { StatusBar } from "expo-status-bar";
 
-export const UserConnect = React.createContext();
+// export const UserConnect = React.createContext();
 
 export default function App() {
   React.useEffect(() => {
@@ -18,9 +19,6 @@ export default function App() {
   }, []);
 
   const [userLog, setUserLog] = React.useState([]);
-
-
-
 
   // Logout
  function disconnect() {
@@ -60,6 +58,7 @@ export default function App() {
   const Stack = createStackNavigator();
 
   return (
+    <SafeAreaView style={styles.container}>
     <NavigationContainer>
       <UserConnect.Provider value={{ userLog, setUserLog, disconnect }}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -70,14 +69,12 @@ export default function App() {
         <StatusBar style="auto" />
       </UserConnect.Provider>
     </NavigationContainer>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
 });

@@ -12,7 +12,8 @@ import ImagePickerComponent from "../components/ImagePickerComponent";
 import { useEffect, useState, useContext } from "react";
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
-import { UserConnect } from "../App";
+// import { UserConnect } from "../App";
+import UserConnect  from "../Context";
 
 export default function Profil({ navigation }) {
   // Image for ImagePickerComponent passed as prop
@@ -25,7 +26,7 @@ export default function Profil({ navigation }) {
   const { userLog, disconnect } = useContext(UserConnect);
 
   const [errorMessage, setErrorMessage] = useState(null);
-
+  const [successMessage, setSuccessMessage] = useState(null);
 
   const [userDetail, setUserDetail] = useState({
     firstName: "",
@@ -76,6 +77,8 @@ export default function Profil({ navigation }) {
 
   // Submit change to server and DB
   async function handleSubmit() {
+    const token = await SecureStore.getItemAsync("token");
+
     if (
       userDetail.firstName === "" ||
       userDetail.lastName === "" ||
@@ -95,16 +98,21 @@ export default function Profil({ navigation }) {
       formdata.append("firstName", userDetail.firstName);
       formdata.append("lastName", userDetail.lastName);
       formdata.append("mail", userDetail.mail);
-      formdata.append("password", userDetail.password);
-      formdata.append("clientPicture", {
-        name: "profile.jpeg",
-        uri: image,
-        type: "image/jpeg",
-      });
+      if (userDetail.password) {
+        formdata.append("password", userDetail.password);
+      }
+      if (image) {
+        formdata.append("clientPicture", {
+          name: "profile.jpeg",
+          uri: image,
+          type: "image/jpeg",
+        });
+      }
       let options = {
         method: "PUT",
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: "bearer " + token,
         },
         body: formdata,
       };
@@ -121,13 +129,13 @@ export default function Profil({ navigation }) {
         // retreive token
         // const token = data.token;
         if (data.success) {
-          setsuccessMessage(data.message);
+          setSuccessMessage(data.message);
           setErrorMessage(null);
           // TODO
           // setUserLog(data.user);
         } else if (!data.success) {
           setErrorMessage(data.message);
-          setsuccessMessage(null);
+          setSuccessMessage(null);
         }
       } catch (error) {
         console.error(error);
@@ -138,23 +146,22 @@ export default function Profil({ navigation }) {
   return (
     <ScrollView contentContainerStyle={styles.containerScroll}>
       {/* <ImageBackground source={require("../assets/nik-shuliahin-rkFIIE9PxH0-unsplash.jpg")}  style={{flex:1, }}> */}
-
+      <TouchableOpacity style={styles.button} onPress={() => disconnect()}>
+          <Text style={styles.textbutton}>Me déconnecter</Text>
+        </TouchableOpacity>
       <View style={styles.container}>
-        {userDetail?.profilePicture !== "" && (
+        {userDetail?.clientPicture !== "" && (
           <Image
             style={styles.profilePicture}
-            source={{ uri: userDetail.profilePicture }}
+            source={{ uri: `http://${backServerAddress}:3001${userDetail.clientPicture}`}}
           />
         )}
 
-        <Text style={styles.content}>{userDetail?.firstName}</Text>
-        <Text style={styles.content}>{userDetail?.lastName}</Text>
-        <Text style={styles.content}>{userDetail?.mail}</Text>
-        <Text style={styles.content}>{userDetail?.pro}</Text>
+        <Text style={styles.content}>Nom : {userDetail?.firstName}</Text>
+        <Text style={styles.content}>Prénom : {userDetail?.lastName}</Text>
+        <Text style={styles.content}>Email : {userDetail?.mail}</Text>
 
-        <TouchableOpacity style={styles.button} onPress={() => disconnect()}>
-          <Text style={styles.textbutton}>Me déconnecter</Text>
-        </TouchableOpacity>
+
 
         <TouchableOpacity
           style={styles.button}
@@ -202,6 +209,11 @@ export default function Profil({ navigation }) {
               placeholder="Entrer un nouveau de mot de passe si vous souhaiter le changer"
               keyboardType="default"
             />
+            <ImagePickerComponent
+              image={image}
+              setImage={setImage}
+              title="Modifier mon Image de profil"
+            />
             <TouchableOpacity
               style={styles.button}
               onPress={() => handleSubmit()}
@@ -210,13 +222,6 @@ export default function Profil({ navigation }) {
                 Enregistrer les modifications
               </Text>
             </TouchableOpacity>
-
-            {/* <ImagePickerComponent
-              image={image}
-              setImage={setImage}
-              title="Modifier mon Image de profil"
-            /> */}
-
           </View>
         )}
       </View>
@@ -236,7 +241,7 @@ const styles = StyleSheet.create({
   },
   containerScroll: {
     flexGrow: 1,
-    backgroundColor: "lightblue",
+    backgroundColor: "#f1ebe3",
   },
 
   profilePicture: {
@@ -248,11 +253,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     backgroundColor: "#fff",
-    width: 250,
+    width: 300,
     height: 50,
     marginBottom: 20,
     padding: 10,
     fontSize: 16,
+    alignSelf: "center"
+
   },
   button: {
     backgroundColor: "#a92e34",
@@ -263,7 +270,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     margin: 36,
   },
-
   text: {
     textAlign: "left",
     alignSelf: "flex-start",
@@ -274,4 +280,11 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontSize: 16,
   },
+  content : {
+    fontSize: 18,
+    alignSelf: "flex-start",
+    paddingHorizontal: 18,
+    paddingVertical: 2,
+
+  }
 });
