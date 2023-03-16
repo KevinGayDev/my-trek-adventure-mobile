@@ -4,10 +4,11 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Image,
+  Image
 } from "react-native";
 import * as React from "react";
 import { useState, useContext, useEffect } from "react";
+import SelectDropdown from 'react-native-select-dropdown';
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
 import { Foundation } from "@expo/vector-icons";
@@ -19,6 +20,10 @@ export default function ParcoursList({ navigation }) {
 
   const [parcoursName, setParcoursName] = useState("");
 
+  const [displayFieldSearch, setDisplayFieldSearch] = useState(false);
+  const [displayFieldFilter, setDisplayFieldFilter] = useState(false);
+  const [difficultyFilter, setDifficultyFilter] = useState(0);
+  const [priceFilter, setPriceFilter] = useState("0");
   const [displaySearch, setDisplaySearch] = useState(false);
   const [displayFilters, setDisplayFilters] = useState(false);
 
@@ -44,7 +49,6 @@ export default function ParcoursList({ navigation }) {
 
   async function displayParcoursList() {
     const token = await SecureStore.getItemAsync("token");
-    //console.log("TOKEN :", token);
     const options = {
       method: "GET",
       headers: {
@@ -69,9 +73,9 @@ export default function ParcoursList({ navigation }) {
     }
   }
 
+  // Filter parcours by name
   async function filterParcoursByName() {
     const token = await SecureStore.getItemAsync("token");
-    //console.log("TOKEN :", token);
     const options = {
       method: "GET",
       headers: {
@@ -84,198 +88,297 @@ export default function ParcoursList({ navigation }) {
       `http://${backServerAddress}:3001/parcours/filter/${parcoursName}`,
       options
     );
+    setParcoursName("");
     const data = await response.json();
-    console.log(data);
     if (data == []) {
       setParcoursFilterList([]);
       setErrorMessage("Aucun résultat trouvé");
     }
+    setParcoursFilterList(data);
+    setDisplaySearch(true);
+    setErrorMessage(data.length + " parcours trouvé(s)");
+  }
+
+  // Filter parcours by difficulty and / or price
+  async function filterParcoursDuo() {
+    if (difficultyFilter === 0 && priceFilter === 0) {
+      setSearchState("cancel");
+    }
+    else if (difficultyFilter > 0 || priceFilter > 0) {
+      const token = await SecureStore.getItemAsync("token");
+      const options = {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      };
+
+      const response = await fetch(`http://${backServerAddress}:3001/parcours/duo/${difficultyFilter}/${priceFilter}`, options);
+
+      setDifficultyFilter(0);
+      setPriceFilter(0);
+
+      const data = await response.json();
+      if (!data) {
+        setParcoursFilterList([]);
+        setErrorMessage("Aucun résultat trouvé");
+        setSearchState("cancel");
+      }
       setParcoursFilterList(data);
       setDisplaySearch(true);
       setErrorMessage(data.length + " parcours trouvé(s)");
+    }
   }
 
-  console.log(errorMessage);
+  function setSearchState(name) {
+    switch (name) {
+      case "search":
+        setDisplayFieldSearch(true);
+        setDisplayFieldFilter(false);
+        break;
+      case "filters":
+        setDisplayFieldSearch(false);
+        setDisplayFieldFilter(true);
+        break;
+      case "cancel":
+        setDisplayFieldSearch(false);
+        setDisplayFieldFilter(false);
+        setDisplaySearch(false);
+        setDisplayFilters(false);
+        break;
+    }
+  }
 
   return (
     <View style={styles.containerParcours}>
       <View>
-        <TextInput
-          style={styles.input}
-          onChangeText={setParcoursName}
-          value={parcoursName}
-          placeholder="Entrer un nom (par ex.): Parcours"
-          keyboardType="default"
-        />
-        <Text style={[styles.highlight]}>Rechercher par nom</Text>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => setDisplayFilters(true)}
-        ><Text style={styles.textbutton}>+ de filtres</Text>
-        </TouchableOpacity>
-        <Text style={[styles.priceText]}>{errorMessage}</Text>
-      </View>
-
-      {/* If the user searches a parcours by name*/}
-      {displaySearch && (
-        (parcoursFilterList.length > 0 && (
-          parcoursFilterList.map((parcours) => (
-            <View style={styles.viewParcour} key={parcours._id}>
-              <Text style={styles.titleParcour}>{parcours._id}</Text>
-              <View style={styles.parcoursTop}>
-                <Image source={{
-                  uri: `http://${backServerAddress}:3001${parcours.parcoursPicture}`,
+        <View style={styles.searchContainer}>
+          <TouchableOpacity style={styles.searchButton} onPress={() => setSearchState("search")} >
+            <Text style={styles.textbutton}>Rechercher par nom</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.searchButton} onPress={() => setSearchState("filters")}>
+            <Text style={styles.textbutton}>+ de filtres</Text>
+          </TouchableOpacity>
+        </View>
+        {displayFieldSearch && (
+          <>
+            <TextInput
+              style={styles.input}
+              onChangeText={setParcoursName}
+              value={parcoursName}
+              placeholder="Entrer un nom (par ex.): Parcours"
+              keyboardType="default"
+            />
+            <TouchableOpacity style={styles.searchButton} onPress={() => setSearchState("cancel")}>
+              <Text style={styles.textbutton}>Annuler</Text>
+            </TouchableOpacity>
+          </>
+        )}
+        {displayFieldFilter && (
+          <View >
+            <View style={styles.searchContainer}>
+              <SelectDropdown
+                data={["Tous", "1", "2", "3"]}
+                buttonStyle={styles.dropdown}
+                onSelect={(selectedItem, index) => {
+                  console.log(selectedItem + " " + index);
                 }}
-                  style={styles.image}
-                />
-
-                <View style={styles.left}>
-                  <Text style={styles.titleParcour}>{parcours.name}</Text>
-                  <Text style={styles.titleCountry}>{parcours.country}</Text>
-
-                 {parcours.duration === 1 ? (
-                    <Text style={styles.highlight}>{parcours.duration} jour</Text>
-                  ) : (
-                    <Text style={[styles.highlight]}>
-                      {parcours.duration} jours
-                    </Text>
-                  )}
-
-                  {parcours.difficulty === 1 && (
-                    <Text style={styles.highlight}>
-                      Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />
-                    </Text>
-                  )}
-
-                  {parcours.difficulty === 2 && (
-                    <Text style={styles.highlight}>
-                      Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
-                      <Foundation name="foot" size={16} color={"#f1ebe3"} />
-                    </Text>
-                  )}
-                  {parcours.difficulty === 3 && (
-                    <Text style={styles.highlight}>
-                      Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
-                      <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
-                      <Foundation name="foot" size={16} color={"#f1ebe3"} />
-                    </Text>
-                  )}
-                </View>
-              </View>
-
-              <View style={styles.parcoursMiddle}>
-                <Text numberOfLines={3} style={styles.textDescription}>
-                  {parcours.description}
-                </Text>
-                <View style={styles.parcoursBottom}>
-                  <View style={styles.leftBottom}>
-                    <Text style={styles.priceText}>{parcours.price} €</Text>
-                  </View>
-                  <View style={styles.right}>
-                    <TouchableOpacity
-                      style={styles.button}
-                      onPress={() =>
-                        // navigation.navigate("ParcoursSingle", { slug : parcours.slug
-                        navigation.navigate("ParcoursSingle", {
-                          slug: parcours.slug,
-                          iD: parcours._id,
-                          name: parcours.name,
-                          // userID: METTRE ICI La donnée à renvoyer dans la page parcours Single.
-                        })
-                      }
-                    >
-                      <Text style={styles.textbutton}>Détail</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
+                buttonTextAfterSelection={(selectedItem, index) => {
+                  // text represented after item is selected
+                  // if data array is an array of objects then return selectedItem.property to render after item is selected
+                  if (selectedItem === "Tous") {
+                    setDifficultyFilter(0);
+                  }
+                  else {
+                    setDifficultyFilter(selectedItem);
+                  }
+                  return selectedItem;
+                }}
+                rowTextForSelection={(item, index) => {
+                  // text represented for each item in dropdown
+                  // if data array is an array of objects then return item.property to represent item in dropdown
+                  return item
+                }}
+              />
+              <TextInput
+                style={styles.input}
+                onChangeText={setPriceFilter}
+                value={priceFilter}
+                placeholder="Entrer un prix (par ex.) : 500"
+                keyboardType="numeric"
+              />
             </View>
-          )))
+            <View style={styles.searchContainer}>
+              <TouchableOpacity style={styles.searchButton} onPress={filterParcoursDuo}>
+                <Text style={styles.textbutton}>Rechercher</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.searchButton} onPress={() => setSearchState("cancel")}>
+                <Text style={styles.textbutton}>Annuler</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={[styles.priceText]}>{errorMessage}</Text>
+          </View>
+        )}
+
+
+        {/* If the user searches a parcours by name*/}
+        {displaySearch && (
+          (parcoursFilterList.length > 0 && (
+            parcoursFilterList.map((parcours) => (
+              <View style={styles.viewParcour} key={parcours._id}>
+                <View style={styles.parcoursTop}>
+                  <Image source={{
+                    uri: `http://${backServerAddress}:3001${parcours.parcoursPicture}`,
+                  }}
+                    style={styles.image}
+                  />
+
+                  <View style={styles.left}>
+                    <Text style={styles.titleParcour}>{parcours.name}</Text>
+                    <Text style={styles.titleCountry}>{parcours.country}</Text>
+
+                    {parcours.duration === 1 ? (
+                      <Text style={styles.highlight}>{parcours.duration} jour</Text>
+                    ) : (
+                      <Text style={[styles.highlight]}>
+                        {parcours.duration} jours
+                      </Text>
+                    )}
+
+                    {parcours.difficulty === 1 && (
+                      <Text style={styles.highlight}>
+                        Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />
+                      </Text>
+                    )}
+
+                    {parcours.difficulty === 2 && (
+                      <Text style={styles.highlight}>
+                        Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+                        <Foundation name="foot" size={16} color={"#f1ebe3"} />
+                      </Text>
+                    )}
+                    {parcours.difficulty === 3 && (
+                      <Text style={styles.highlight}>
+                        Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+                        <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+                        <Foundation name="foot" size={16} color={"#f1ebe3"} />
+                      </Text>
+                    )}
+                  </View>
+                </View>
+
+                <View style={styles.parcoursMiddle}>
+                  <Text numberOfLines={3} style={styles.textDescription}>
+                    {parcours.description}
+                  </Text>
+                  <View style={styles.parcoursBottom}>
+                    <View style={styles.leftBottom}>
+                      <Text style={styles.priceText}>{parcours.price} €</Text>
+                    </View>
+                    <View style={styles.right}>
+                      <TouchableOpacity
+                        style={styles.button}
+                        onPress={() =>
+                          // navigation.navigate("ParcoursSingle", { slug : parcours.slug
+                          navigation.navigate("ParcoursSingle", {
+                            slug: parcours.slug,
+                            iD: parcours._id,
+                            name: parcours.name,
+                            // userID: METTRE ICI La donnée à renvoyer dans la page parcours Single.
+                          })
+                        }
+                      >
+                        <Text style={styles.textbutton}>Détail</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            )))
+          )
         )
-      )
-      
-      }
-      {/* If the user uses one or more filters for a search*/}
-      {/*displayFilters && (
 
-      )*/}
+        }
 
-      {/* Normal display */}
-      {!displaySearch && !displayFilters && (
-        <>
-          {parcoursList.map((parcours) => (
-            <View style={styles.viewParcour} key={parcours._id}>
-              <View style={styles.parcoursTop}>
-                <Image source={{
-                  uri: `http://${backServerAddress}:3001${parcours.parcoursPicture}`,
-                }}
-                  style={styles.image}
-                />
+        {/* Normal display */}
+        {!displayFieldSearch && (!displayFilters && !displaySearch) && (
+          <>
+            {parcoursList.map((parcours) => (
+              <View style={styles.viewParcour} key={parcours._id}>
+                <View style={styles.parcoursTop}>
+                  <Image source={{
+                    uri: `http://${backServerAddress}:3001${parcours.parcoursPicture}`,
+                  }}
+                    style={styles.image}
+                  />
 
-                <View style={styles.left}>
-                  <Text style={styles.titleParcour}>{parcours.name}</Text>
-                  <Text style={styles.titleCountry}>{parcours.country}</Text>
+                  <View style={styles.left}>
+                    <Text style={styles.titleParcour}>{parcours.name}</Text>
+                    <Text style={styles.titleCountry}>{parcours.country}</Text>
 
-                  {parcours.duration === 1 ? (
-                    <Text style={styles.highlight}>{parcours.duration} jour</Text>
-                  ) : (
-                    <Text style={[styles.highlight]}>
-                      {parcours.duration} jours
-                    </Text>
-                  )}
+                    {parcours.duration === 1 ? (
+                      <Text style={styles.highlight}>{parcours.duration} jour</Text>
+                    ) : (
+                      <Text style={[styles.highlight]}>
+                        {parcours.duration} jours
+                      </Text>
+                    )}
 
-                  {parcours.difficulty === 1 && (
-                    <Text style={styles.highlight}>
-                      Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />
-                    </Text>
-                  )}
+                    {parcours.difficulty === 1 && (
+                      <Text style={styles.highlight}>
+                        Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />
+                      </Text>
+                    )}
 
-                  {parcours.difficulty === 2 && (
-                    <Text style={styles.highlight}>
-                      Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
-                      <Foundation name="foot" size={16} color={"#f1ebe3"} />
-                    </Text>
-                  )}
-                  {parcours.difficulty === 3 && (
-                    <Text style={styles.highlight}>
-                      Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
-                      <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
-                      <Foundation name="foot" size={16} color={"#f1ebe3"} />
-                    </Text>
-                  )}
-                </View>
-              </View>
-
-              <View style={styles.parcoursMiddle}>
-                <Text numberOfLines={3} style={styles.textDescription}>
-                  {parcours.description}
-                </Text>
-                <View style={styles.parcoursBottom}>
-                  <View style={styles.leftBottom}>
-                    <Text style={styles.priceText}>{parcours.price} €</Text>
+                    {parcours.difficulty === 2 && (
+                      <Text style={styles.highlight}>
+                        Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+                        <Foundation name="foot" size={16} color={"#f1ebe3"} />
+                      </Text>
+                    )}
+                    {parcours.difficulty === 3 && (
+                      <Text style={styles.highlight}>
+                        Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+                        <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+                        <Foundation name="foot" size={16} color={"#f1ebe3"} />
+                      </Text>
+                    )}
                   </View>
-                  <View style={styles.right}>
-                    <TouchableOpacity
-                      style={styles.button}
-                      onPress={() =>
-                        // navigation.navigate("ParcoursSingle", { slug : parcours.slug
-                        navigation.navigate("ParcoursSingle", {
-                          slug: parcours.slug,
-                          iD: parcours._id,
-                          name: parcours.name,
-                          // userID: METTRE ICI La donnée à renvoyer dans la page parcours Single.
-                        })
-                      }
-                    >
-                      <Text style={styles.textbutton}>Détail</Text>
-                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.parcoursMiddle}>
+                  <Text numberOfLines={3} style={styles.textDescription}>
+                    {parcours.description}
+                  </Text>
+                  <View style={styles.parcoursBottom}>
+                    <View style={styles.leftBottom}>
+                      <Text style={styles.priceText}>{parcours.price} €</Text>
+                    </View>
+                    <View style={styles.right}>
+                      <TouchableOpacity
+                        style={styles.button}
+                        onPress={() =>
+                          // navigation.navigate("ParcoursSingle", { slug : parcours.slug
+                          navigation.navigate("ParcoursSingle", {
+                            slug: parcours.slug,
+                            iD: parcours._id,
+                            name: parcours.name,
+                            // userID: METTRE ICI La donnée à renvoyer dans la page parcours Single.
+                          })
+                        }
+                      >
+                        <Text style={styles.textbutton}>Détail</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
               </View>
-            </View>
-          ))}
-        </>
-      )}
+            ))}
+          </>
+        )}
+      </View>
     </View>
   );
 }
@@ -313,7 +416,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 16,
   },
-
   left: {
     paddingHorizontal: 16,
     flex: 1,
@@ -324,6 +426,14 @@ const styles = StyleSheet.create({
   right: {
     paddingHorizontal: 10,
     alignContent: "flex-end",
+  },
+  dropdown: {
+    width: '50%',
+    height: '100%',
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#444',
   },
   button: {
     paddingVertical: 2,
@@ -337,6 +447,21 @@ const styles = StyleSheet.create({
   textbutton: {
     alignSelf: "center",
     fontSize: 14,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignSelf: "stretch",
+    justifyContent: "space-evenly",
+  },
+  searchButton: {
+    paddingVertical: 2,
+    paddingHorizontal: 2,
+    alignContent: "center",
+    justifyContent: "space-evenly",
+    borderRadius: 16,
+    backgroundColor: "#f89d0e",
+    width: 150,
+    height: 40
   },
   image: {
     width: 180,
@@ -356,9 +481,8 @@ const styles = StyleSheet.create({
   priceText: {
     fontWeight: "bold",
   },
-
   input: {
-    borderRadius : 8,
+    borderRadius: 8,
     borderWidth: 1,
     height: 40,
   }

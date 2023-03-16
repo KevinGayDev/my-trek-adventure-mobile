@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { SafeAreaView, StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Login from "./views/Login";
@@ -58,6 +58,7 @@ export default function App() {
   const Stack = createStackNavigator();
 
   return (
+    <SafeAreaView style={styles.container}>
     <NavigationContainer>
       <UserConnect.Provider value={{ userLog, setUserLog, disconnect }}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -68,14 +69,12 @@ export default function App() {
         <StatusBar style="auto" />
       </UserConnect.Provider>
     </NavigationContainer>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
 });
