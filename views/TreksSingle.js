@@ -10,21 +10,28 @@ import {
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
 import { UserConnect } from "../App";
+import { format } from "date-fns";
 
 export default function TreksSingle({ route, navigation }) {
   const { trekID, slug, slugTrek } = route.params;
   const { userLog } = useContext(UserConnect);
+  const [guide, setGuide] = useState({});
 
   console.log(slugTrek);
 
   // retreive parcours details from server
   const [parcours, setParcours] = useState({});
-  const [treks, setTreks] = useState([]);
-
+  const [treks, setTreks] = useState({
+    beginDate: "2023-03-14T17:14:13.951Z",
+    endDate: "2023-03-14T17:14:13.951Z",
+  });
   const [errorMessage, setErrorMessage] = useState(null);
+  // const [successMessage, setSuccessMessage] = useState(null);
+
   useEffect(() => {
-    getParcours();
     getTreks();
+    getParcours();
+    // getGuide();
   }, [slug]);
 
   // Retreive One parcours from server
@@ -50,7 +57,6 @@ export default function TreksSingle({ route, navigation }) {
     if (data) {
       setParcours(data);
       setErrorMessage(null);
-      // displayTreks()
     }
   }
 
@@ -81,6 +87,33 @@ export default function TreksSingle({ route, navigation }) {
       setErrorMessage(null);
     }
   }
+
+
+// Display the Guide for the trek
+async function getGuide() {
+  const token = await SecureStore.getItemAsync("token");
+  const options = {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+  };
+  const response = await fetch(
+    `http://${backServerAddress}:3001/guides/get/${treks?.guideID}`,
+    options
+  );
+  const data = await response.json();
+  if (!data) {
+    setGuide({});
+    setErrorMessage("Aucun résultat trouvé");
+  }
+  if (data) {
+    setGuide(data);
+    setErrorMessage(null);
+  }
+}
 
   // Send Bookings to server
   async function putBooking() {
@@ -114,11 +147,16 @@ export default function TreksSingle({ route, navigation }) {
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
         <Text style={styles.title}>{parcours.name}</Text>
-        <Text style={styles.stepDescription}>{treks?.trekName}</Text>
-   
-        <Text style={styles.stepTitle}>{treks?.beginDate}</Text>
-        <Text style={styles.stepTitle}>{treks?.endDate}</Text>
-        <Text>Prix :{parcours.price} €</Text>
+        <Text>départ le : </Text>
+        <Text style={styles.stepTitle}>
+          {format(new Date(treks?.beginDate), "dd/MM/yyyy")}
+        </Text>
+        <Text>arrivée le : </Text>
+        <Text style={styles.stepTitle}>
+          {format(new Date(treks?.endDate), "dd/MM/yyyy")}
+        </Text>
+        {/* <Text>Guide : </Text><Text style={styles.stepTitle}>{guide?.firstName} {guide?.lastName}</Text> */}
+        <Text>Prix :</Text><Text style={styles.stepTitle}>{parcours?.price} €</Text>
         <TouchableOpacity style={styles.button} onPress={() => putBooking()}>
           <Text style={styles.textbutton}>Réserver et Payer</Text>
         </TouchableOpacity>

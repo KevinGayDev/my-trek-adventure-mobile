@@ -3,18 +3,16 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
   ScrollView,
-  TouchableOpacity,
 } from "react-native";
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
 import * as Location from 'expo-location';
 import { UserConnect } from "../App";
-import MapView, {
-
-} from "react-native-maps";
+import MapView from "react-native-maps";
 import { Marker } from "react-native-maps";
+import { format } from 'date-fns'
+
 
 export default function TreksUser({ route, navigation }) {
   const { trekID, slug, slugTrek, parcoursID } = route.params;
@@ -23,15 +21,25 @@ export default function TreksUser({ route, navigation }) {
   // retreive parcours details from server
   const [parcours, setParcours] = useState({});
   const [parcoursSteps, setParcoursSteps] = useState([]);
+  const [treks, setTreks] = useState({
+    beginDate: "2023-03-14T17:14:13.951Z" ,
+    endDate: "2023-03-14T17:14:13.951Z"
+  });
+  const [guide, setGuide] = useState({});
   const [treks, setTreks] = useState([]);
   const [userPos] = useState ({latitude: "", longitude:""});
 
   const [errorMessage, setErrorMessage] = useState(null);
   useEffect(() => {
-    getParcours();
     getTreks();
-    getUserPosition();
+    getParcours();
+     // getGuide();
+     getUserPosition();
   }, [slugTrek]);
+
+  // useEffect(() => {
+ 
+  // }, [parcours]);
 
   // Retreive One parcours from server
   async function getParcours() {
@@ -58,10 +66,11 @@ export default function TreksUser({ route, navigation }) {
       setParcours(data);
       setParcoursSteps(data.steps);
       setErrorMessage(null);
-      // displayTreks()
     }
   }
-  console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXX3", parcoursSteps);
+
+  if (parcours) {
+  console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXX3", treks);}
 
   // Display all the treks available for one parcours
   async function getTreks() {
@@ -86,38 +95,38 @@ export default function TreksUser({ route, navigation }) {
     if (data) {
       setTreks(data);
       setErrorMessage(null);
+      // getGuide();
     }
   }
 
-  // Send Bookings to server
-  async function putBooking() {
+  // Display the Guide for the trek
+  async function getGuide() {
     const token = await SecureStore.getItemAsync("token");
     const options = {
-      method: "PUT",
+      method: "GET",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
-      body: JSON.stringify({ trekID: trekID }),
     };
-
+    
+    
     const response = await fetch(
-      `http://${backServerAddress}:3001/bookings/add`,
+      `http://${backServerAddress}:3001/guides/get/${treks?.guideID}`,
       options
     );
     const data = await response.json();
     if (!data) {
-      setParcours({});
+      setGuide({});
       setErrorMessage("Aucun résultat trouvé");
     }
     if (data) {
-      setParcours(data);
-
+      setGuide(data);
       setErrorMessage(null);
     }
   }
-
+  
   async function getUserPosition(){
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') 
@@ -135,11 +144,9 @@ export default function TreksUser({ route, navigation }) {
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
         <Text style={styles.title}>{parcours.name}</Text>
-        <Text style={styles.stepDescription}>{treks?.trekName}</Text>
-
-        <Text style={styles.stepTitle}>{treks?.beginDate}</Text>
-        <Text style={styles.stepTitle}>{treks?.endDate}</Text>
-        <Text style={styles.stepTitle}>Guide : </Text>
+        <Text>départ le : </Text><Text style={styles.stepTitle}>{format(new Date(treks?.beginDate), 'dd/MM/yyyy')}</Text>
+        <Text>arrivée le : </Text><Text style={styles.stepTitle}>{format(new Date(treks?.endDate), 'dd/MM/yyyy')}</Text>
+        { guide && <View><Text>Guide : </Text><Text style={styles.stepTitle}>{guide?.firstName} {guide?.lastName}</Text></View>}
       </View>
       <View style={styles.containerMap}>
         <MapView
@@ -154,7 +161,7 @@ export default function TreksUser({ route, navigation }) {
           {/* Custom OSM Tile */}
           {parcoursSteps.map((marker) => (
             <Marker
-              // key={index}
+              key={marker.stepLatitude}
               coordinate={{
                 latitude: marker.stepLatitude,
                 longitude: marker.stepLongitude,
