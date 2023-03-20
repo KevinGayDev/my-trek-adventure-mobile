@@ -1,12 +1,9 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import ParcoursList from "../components/ParcoursList";
 import { createStackNavigator } from "@react-navigation/stack";
-import Parcours from "./Parcours";
 import ParcoursSingle from "./Parcours";
-// import { UserConnect } from "../App";
 import UserConnect  from "../Context";
 import { useContext } from "react";
-
 
 export default function ParcoursStackNav({ navigation }) {
 

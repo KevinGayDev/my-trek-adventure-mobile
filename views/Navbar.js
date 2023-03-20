@@ -48,6 +48,7 @@ export default function Navbar({ navigation }) {
           headerStyle: {
             backgroundColor: "#fda82e",
           },
+          unmountOnBlur: true
         }}
       />
 

@@ -133,12 +133,12 @@ export default function Login({ navigation }) {
           >
             <Text style={styles.textbutton}>S'enregistrer</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate("Navbar")}
           >
             <Text style={styles.textbutton}>Passage secret</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           {{ errorMessage } && <Text>{errorMessage}</Text>}
           {{ successMessage } && <Text>{successMessage}</Text>}
