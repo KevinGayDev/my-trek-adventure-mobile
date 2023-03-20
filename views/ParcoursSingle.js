@@ -10,12 +10,10 @@ import {
 import backServerAddress from "../config";
 import * as SecureStore from "expo-secure-store";
 // import { UserConnect } from "../App";
-import UserConnect  from "../Context";
+import UserConnect from "../Context";
 import { Foundation } from "@expo/vector-icons";
-import { format } from 'date-fns'
-import MapView, {
-
-} from "react-native-maps";
+import { format } from "date-fns";
+import MapView from "react-native-maps";
 import { Marker } from "react-native-maps";
 
 export default function ParcoursSingle({ route, navigation }) {
@@ -102,67 +100,68 @@ export default function ParcoursSingle({ route, navigation }) {
           style={styles.image}
         />
         {parcours.duration === 1 ? (
-          <Text style={styles.highlight} >Durée : {parcours.duration} jour</Text>
+          <Text style={styles.highlight}>Durée : {parcours.duration} jour</Text>
         ) : (
-          <Text style={styles.highlight}>Durée : {parcours.duration} jours</Text>
+          <Text style={styles.highlight}>
+            Durée : {parcours.duration} jours
+          </Text>
         )}
-       
-
 
         {parcours.difficulty === 1 && (
-                <Text style={styles.highlight}>
-                  Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />
+          <Text style={styles.highlight}>
+            Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />
+          </Text>
+        )}
+
+        {parcours.difficulty === 2 && (
+          <Text style={styles.highlight}>
+            Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+            <Foundation name="foot" size={16} color={"#f1ebe3"} />
+          </Text>
+        )}
+        {parcours.difficulty === 3 && (
+          <Text style={styles.highlight}>
+            Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+            <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
+            <Foundation name="foot" size={16} color={"#f1ebe3"} />
+          </Text>
+        )}
+
+        <Text style={styles.priceText}>{parcours.price} €</Text>
+
+        <Text style={styles.title3}>Prochains départs</Text>
+
+        <View style={styles.step}>
+          {treks?.map((trek) => (
+            <View key={trek?._id} style={styles.trek}>
+              <View>
+                <Image />
+              </View>
+              <View style={styles.trekItem}>
+                <Text style={styles.trekTitle}>
+                  du {format(new Date(trek?.beginDate), "dd/MM/yyyy")}
                 </Text>
-              )}
-
-              {parcours.difficulty === 2 && (
-                <Text style={styles.highlight}>
-                  Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
-                  <Foundation name="foot" size={16} color={"#f1ebe3"} />
+                <Text style={styles.trekTitle}>
+                  {" "}
+                  au {format(new Date(trek?.endDate), "dd/MM/yyyy")}
                 </Text>
-              )}
-              {parcours.difficulty === 3 && (
-                <Text style={styles.highlight}>
-                  Niveau <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
-                  <Foundation name="foot" size={16} color={"#f1ebe3"} />{" "}
-                  <Foundation name="foot" size={16} color={"#f1ebe3"} />
-                </Text>
-              )}
 
-<Text style={styles.priceText}>{parcours.price} €</Text>
-
-<Text style={styles.title3}>Prochains départs</Text>
-
-<View style={styles.step} > 
-
-{treks?.map((trek) => (
-          <View key={trek?._id} style={styles.trek}>
-            <View >
-              <Image />
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() =>
+                    navigation.navigate("TreksSingle", {
+                      trekID: trek._id,
+                      slug: slug,
+                      slugTrek: trek.slug,
+                    })
+                  }
+                >
+                  <Text style={styles.textbutton}>Réserver</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.trekItem} >
-              <Text style={styles.trekTitle}>du {format(new Date(trek?.beginDate), 'dd/MM/yyyy')}</Text>
-              <Text style={styles.trekTitle}> au {format(new Date(trek?.endDate), 'dd/MM/yyyy')}</Text>
-
-             
-              {/* <Text style={styles.trekDescription}>{trek?.trekName}</Text> */}
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() =>
-                  // navigation.navigate("ParcoursSingle", { slug : parcours.slug
-                  navigation.navigate("TreksSingle", {
-                    trekID: trek._id,
-                    slug: slug,
-                    slugTrek: trek.slug,
-                  })
-                }
-              >
-                <Text style={styles.textbutton}>Réserver</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
-</View>
+          ))}
+        </View>
 
         <Text style={styles.title3}>Détail du parcours</Text>
         <Text style={styles.stepDescription}>{parcours.description}</Text>
@@ -172,8 +171,12 @@ export default function ParcoursSingle({ route, navigation }) {
             <View style={styles.stepTop}>
               <View style={styles.left}>
                 <Text style={styles.stepTitle}>{step.stepName}</Text>
-                <Text style={styles.stepCoords}>Latitude : {step.stepLatitude}°</Text>
-                <Text style={styles.stepCoords}>Longitude : {step.stepLongitude}°</Text>
+                <Text style={styles.stepCoords}>
+                  Latitude : {step.stepLatitude}°
+                </Text>
+                <Text style={styles.stepCoords}>
+                  Longitude : {step.stepLongitude}°
+                </Text>
               </View>
               <View style={styles.left}>
                 <Image
@@ -190,30 +193,30 @@ export default function ParcoursSingle({ route, navigation }) {
           </View>
         ))}
 
-<View style={styles.containerMap}>
-        <MapView
-          style={styles.map}
-          region={{
-            latitude: parcoursSteps[0]?.stepLatitude,
-            longitude: parcoursSteps[0]?.stepLongitude,
-            latitudeDelta: 3,
-            longitudeDelta: 3,
-          }}
-        >
-          {parcoursSteps.map((marker) => (
-            <Marker
-              key={marker.stepLatitude}
-              coordinate={{
-                latitude: marker.stepLatitude,
-                longitude: marker.stepLongitude,
-              }}
-              title={marker.stepName}
-              description={marker.stepDescription}
-              pinColor="black"
-            />
-          ))}
-    </MapView>
-    </View>
+        <View style={styles.containerMap}>
+          <MapView
+            style={styles.map}
+            region={{
+              latitude: parcoursSteps[0]?.stepLatitude,
+              longitude: parcoursSteps[0]?.stepLongitude,
+              latitudeDelta: 3,
+              longitudeDelta: 3,
+            }}
+          >
+            {parcoursSteps.map((marker) => (
+              <Marker
+                key={marker.stepLatitude}
+                coordinate={{
+                  latitude: marker.stepLatitude,
+                  longitude: marker.stepLongitude,
+                }}
+                title={marker.stepName}
+                description={marker.stepDescription}
+                pinColor="black"
+              />
+            ))}
+          </MapView>
+        </View>
       </View>
     </ScrollView>
   );
@@ -226,8 +229,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
   },
-  stepContainer: {
-  },
+  stepContainer: {},
   stepTop: {
     flexDirection: "row",
   },
@@ -281,14 +283,11 @@ const styles = StyleSheet.create({
     margin: 10,
     borderRadius: 12,
     backgroundColor: "#f1ebe3",
-
-
   },
   right: {
     // flex: 1,
     // backgroundColor: "pink",
-    alignContent: 'center',
-
+    alignContent: "center",
   },
   left: {
     // backgroundColor: "yellow",
@@ -296,7 +295,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   stepCoords: {
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
   },
   stepDescription: {
     paddingVertical: 10,
@@ -318,11 +317,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   trekItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginVertical: 10,
   },
   trek: {
-paddingHorizontal: 16,
+    paddingHorizontal: 16,
   },
   button: {
     paddingVertical: 2,

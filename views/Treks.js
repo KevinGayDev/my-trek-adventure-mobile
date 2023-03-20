@@ -101,7 +101,7 @@ export default function Treks({ navigation }) {
             <TouchableOpacity
               style={styles.button}
               onPress={() =>
-                navigation.navigate("Parcours", {
+                navigation.navigate("Réserver", {
                 })
               }
             >
@@ -179,17 +179,16 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingVertical: 2,
-    paddingHorizontal: 2,
+    paddingHorizontal: 8,
     alignContent: "center",
     justifyContent: "center",
     borderRadius: 16,
     backgroundColor: "#f89d0e",
-    width: 70,
     marginHorizontal: 5,
   },
   textbutton: {
     alignSelf: "center",
-    fontSize: 12,
+    fontSize: 14,
   },
   text: {
     fontSize: 14,
