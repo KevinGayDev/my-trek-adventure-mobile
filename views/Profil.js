@@ -130,9 +130,7 @@ export default function Profil({ navigation }) {
         // const token = data.token;
         if (data.success) {
           setSuccessMessage(data.message);
-          setErrorMessage(null);
-          // TODO
-          // setUserLog(data.user);
+          setErrorMessage(null)
         } else if (!data.success) {
           setErrorMessage(data.message);
           setSuccessMessage(null);
@@ -145,7 +143,6 @@ export default function Profil({ navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.containerScroll}>
-      {/* <ImageBackground source={require("../assets/nik-shuliahin-rkFIIE9PxH0-unsplash.jpg")}  style={{flex:1, }}> */}
       <TouchableOpacity style={styles.button} onPress={() => disconnect()}>
           <Text style={styles.textbutton}>Me déconnecter</Text>
         </TouchableOpacity>
@@ -225,7 +222,6 @@ export default function Profil({ navigation }) {
           </View>
         )}
       </View>
-      {/* </ImageBackground> */}
     </ScrollView>
   );
 }

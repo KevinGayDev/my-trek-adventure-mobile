@@ -127,6 +127,8 @@ export default function TreksSingle({ route, navigation }) {
     if (data) {
       setParcours(data);
       setErrorMessage(null);
+      navigation.navigate("Mes treks", {
+        })
     }
   }
 
@@ -142,7 +144,7 @@ export default function TreksSingle({ route, navigation }) {
         <Text style={styles.stepTitle}>
           {format(new Date(treks?.endDate), "dd/MM/yyyy")}
         </Text>
-        {/* <Text>Guide : </Text><Text style={styles.stepTitle}>{guide?.firstName} {guide?.lastName}</Text> */}
+        <Text>Guide : </Text><Text style={styles.stepTitle}>{guide?.firstName} {guide?.lastName}</Text>
         <Text>Prix :</Text><Text style={styles.stepTitle}>{parcours?.price} €</Text>
         <TouchableOpacity style={styles.button} onPress={() => putBooking()}>
           <Text style={styles.textbutton}>Réserver et Payer</Text>

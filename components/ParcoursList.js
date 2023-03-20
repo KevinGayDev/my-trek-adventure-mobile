@@ -181,6 +181,7 @@ export default function ParcoursList({ navigation }) {
             <View style={styles.searchContainer}>
               <SelectDropdown
                 data={["Tous", "1", "2", "3"]}
+                defaultButtonText={"Difficulté"}
                 buttonStyle={styles.dropdown}
                 onSelect={(selectedItem, index) => {
                   console.log(selectedItem + " " + index);
@@ -206,7 +207,7 @@ export default function ParcoursList({ navigation }) {
                 style={styles.input}
                 onChangeText={setPriceFilter}
                 value={priceFilter}
-                placeholder="Entrer un prix (par ex.) : 500"
+                placeholder="Par prix max (par ex. 500) "
                 keyboardType="numeric"
               />
             </View>
@@ -281,12 +282,10 @@ export default function ParcoursList({ navigation }) {
                       <TouchableOpacity
                         style={styles.button}
                         onPress={() =>
-                          // navigation.navigate("ParcoursSingle", { slug : parcours.slug
                           navigation.navigate("ParcoursSingle", {
                             slug: parcours.slug,
                             iD: parcours._id,
                             name: parcours.name,
-                            // userID: METTRE ICI La donnée à renvoyer dans la page parcours Single.
                           })
                         }
                       >
@@ -365,7 +364,6 @@ export default function ParcoursList({ navigation }) {
                             slug: parcours.slug,
                             iD: parcours._id,
                             name: parcours.name,
-                            // userID: METTRE ICI La donnée à renvoyer dans la page parcours Single.
                           })
                         }
                       >
@@ -428,12 +426,13 @@ const styles = StyleSheet.create({
     alignContent: "flex-end",
   },
   dropdown: {
-    width: '50%',
-    height: '100%',
+    width:124,
+    height: 40,
     backgroundColor: '#FFF',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#444',
+    borderColor: 'black',
+    alignSelf: "center"
   },
   button: {
     paddingVertical: 2,
@@ -461,7 +460,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: "#f89d0e",
     width: 150,
-    height: 40
+    height: 40,
+    marginHorizontal: 8
   },
   image: {
     width: 180,
@@ -485,5 +485,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     height: 40,
+    paddingHorizontal: 8,
+    marginVertical: 8,
   }
 });
